@@ -1,0 +1,33 @@
+-state main
+forget_all
+look_creature
+recall
+if player
+set_state prep_attack
+
+-state prep_attack
+remember
+say "I'll kill you "
+say
+say "!"
+set_state attack
+
+-state attack 
+listen
+if ".*key of elementals.*"
+set_state quest_start
+move_toward
+if no_path not_found
+set_state main
+recall
+melee
+
+-state quest_0
+say "You know of the key..."
+set_state quest_1
+
+-state quest_1
+listen
+if "next quest trigger..."
+set_state quest_2
+

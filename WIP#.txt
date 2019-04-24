@@ -1,0 +1,2 @@
+implement cell_blocks_sight, cell_blocks_movement - extensions? //enity_blocking
+continue adding functionality & testing script.c

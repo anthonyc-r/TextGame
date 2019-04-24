@@ -1,0 +1,30 @@
+-state main
+look_creature
+recall
+if Zoltan
+set_state one
+say "Testing !!"
+say "testing again !! woo"
+
+-state prep
+forget_all
+remember
+set_state one
+
+-state one
+move_toward
+
+-state done
+look_creature
+recall
+if boar
+set_state boar
+say "State Done"
+
+-state boar
+move_toward
+if DONE
+set_state boar_done
+
+-state boar_done
+say "boar done"
