@@ -1,8 +1,8 @@
 -state main
 look_creature
 recall
-if Zoltan
-set_state one
+#if Zoltan
+#set_state one
 say "Testing !!"
 say "testing again !! woo"
 

@@ -1,5 +1,5 @@
 #include "vector.h"
-#include "math.h"
+#include <math.h>
 
 struct vector2f
 new_vector2f(float x, float y)

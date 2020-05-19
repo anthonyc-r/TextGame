@@ -1,4 +1,4 @@
-//define DEBUG
+#define DEBUG
 
 #include "script.h"
 #include "gameloader.h"
@@ -85,13 +85,15 @@ script_extract_line(char *string)
 }
 
 enum script_status
-script_parse_line(struct scrpt *script, struct mem *stack, struct script_line *line)
+script_parse_line(struct scrpt *script, struct mem **stack, struct script_line *line)
 {
 	int cstate = script->current_state;
 	char *op = line->op;
 	int opsz = strlen(op);
 	if (opsz == 0)
 		return TURN_END; // No op, end turn.
+	else if (op[0] == '#')
+		return TURN_CONTINUE; // Comment, skip.
 	char *arg = line->argv[0];
 
 	DEBUG_PRINT(("Read line %s\n", line->op));
@@ -126,16 +128,16 @@ script_parse_line(struct scrpt *script, struct mem *stack, struct script_line *l
 		return TURN_CONTINUE;
 	} else if (strcmp(op, "remember") == 0) {
 		if (arg == NULL) {
-			memory_push_copy(&stack, script->memory);
+			memory_push_copy(stack, script->memory);
 		} else {
 			struct mem *mem = new_memory();
 			memory_set_string(mem, arg);
-			memory_push_copy(&stack, mem);
+			memory_push_copy(stack, mem);
 		}
 		DEBUG_PRINT(("Invoked remember\n"));
 		return TURN_CONTINUE;
 	} else if (strcmp(op, "recall") == 0) {
-		struct mem *mem = memory_pop(&stack);
+		struct mem *mem = memory_pop(stack);
 		if (mem) {
 			deinit_memory(script->memory);
             		//free(script->memory);
@@ -145,13 +147,13 @@ script_parse_line(struct scrpt *script, struct mem *stack, struct script_line *l
 		return TURN_CONTINUE;
 	} else if (strcmp(op, "forget") == 0) {
 		DEBUG_PRINT(("forget invoked\n"));
-		deinit_memory(memory_pop(&stack));
+		deinit_memory(memory_pop(stack));
 		return TURN_CONTINUE;
 	} else if (strcmp(op, "forget_all") == 0) {
 		DEBUG_PRINT(("forget_all invoked\n"));
 		do {
-			deinit_memory(memory_pop(&stack));
-		} while (stack->next);
+			deinit_memory(memory_pop(stack));
+		} while ((*stack)->next);
 		return TURN_CONTINUE;
 	} else {
 		return NO_MATCH;
@@ -165,7 +167,7 @@ script_perform_entity(struct scrpt *script, struct ent *entity)
 	struct script_line *line;
 	do {
 		line = &script->lines[script->current_line];
-		status = script_parse_line(script, entity->memory, line);
+		status = script_parse_line(script, &entity->memory, line);
 		if (status == NO_MATCH)
 			status = script_perform_line_entity(script, entity, line);
 		script->current_line++;
@@ -186,7 +188,7 @@ script_perform_creature(struct scrpt *script, struct ctr *creature)
 	struct script_line *line;
 	do {
 		line = &script->lines[script->current_line];
-		status = script_parse_line(script, creature->memory, line);
+		status = script_parse_line(script, &creature->memory, line);
 		if (status == NO_MATCH)
 			status = script_perform_line_creature(script, creature, line);
 		script->current_line++;

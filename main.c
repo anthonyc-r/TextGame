@@ -1,4 +1,4 @@
-#define DEBUG
+//define DEBUG
 #define _XOPEN_SOURCE 700
 
 #include <stdio.h>
@@ -101,7 +101,7 @@ draw(struct map *map)
 	draw_to_main(map_window);
 	render_info(info_window);
 	draw_to_main(info_window);
-    //render_chat(chat_window);
+    render_chat(chat_window);
     draw_to_main(chat_window);
 	for (int i = 0; i < windows.num; ++i) {
 		struct wnw tmp_wnw = windows.windows[i];
