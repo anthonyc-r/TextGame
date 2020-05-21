@@ -27,7 +27,7 @@ split_line(char *l, char split)
 			p[ps] = &line[i+1];
 		}
 	}
-	p[ps+1] = '\0';
+	p[ps+1] = NULL;
 	return p;
 }
 

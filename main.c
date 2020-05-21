@@ -38,7 +38,7 @@ init_data(void)
     plr_position.x = 14;
     plr_position.y = 13;
 	struct ctr plr = new_creature("Zoltan", "Powerful mage", 100, 100, 0);
-	plr.hearing = 100;
+	plr.hearing = 5;
 	player = insert_creature(active_map, &plr, NULL, plr_position);
 	DEBUG_PRINT(("done inserting test objects\n"));
 	//init display data
@@ -79,11 +79,12 @@ void render_chat(struct wnw *window)
         DEBUG_PRINT(("Found sounds!!\n"));
         message = sound->type->text;
     }
+    clear_window(window, '+');
     if (message) {
         int len = strlen(message);
         memcpy(window->data, message, len);
     } else {
-		window->data = "no sounds";
+		memcpy(window->data, "no sounds", 9);
 	}
 }
 
@@ -160,6 +161,9 @@ void
 logic(struct map *map)
 {
 	DEBUG_PRINT(("Logic\n"));
+	// clean up
+	clear_sounds(active_map);
+	// get input
 	char c;
 	while ((c = getkey())) {
 		if (c < 97 || c > 122) {
@@ -178,7 +182,6 @@ logic(struct map *map)
 		if (creature->script)
 			script_perform_creature(creature->script, creature);
 	}
-    clear_sounds(active_map);
 }
 
 int
