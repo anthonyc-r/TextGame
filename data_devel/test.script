@@ -3,12 +3,12 @@ look_creature
 recall
 if Zoltan
 set_state testsay
-say "Testing !!"
-say "testing again !! woo"
+say Testing !!
+say testing again !! woo
 
 -state testsay
-say "Testing one"
-say "testing two"
+say Testing one
+say testing two
 
 -state prep
 forget_all

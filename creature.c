@@ -8,6 +8,7 @@
 #include "vector.h"
 #include "debug.h"
 #include "sound.h"
+#include "utility.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -18,9 +19,6 @@
 #define MAX_SPEECH_SIZE 20
 #define CREATURE_LOOK_ANGLE 0.1
 #define MAX_CREATURE_SIGHTINGS 5
-
-#define MAX(a,b) ((a) > (b) ? a : b)
-#define MIN(a,b) ((a) < (b) ? a : b)
 
 bool
 creature_walk_toward(struct ctr *creature, struct ctr *other)

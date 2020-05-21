@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#define MAX(a,b) ((a) > (b) ? a : b)
+#define MIN(a,b) ((a) < (b) ? a : b)
+
 char ** split_line(char *l, char split);
 char *read_line(FILE *fp);
 #endif

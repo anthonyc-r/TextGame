@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "window.h"
 #include "vector.h"
+#include "utility.h"
 
 struct wnw *
 new_window(int x, int y, int width, int height)
@@ -60,6 +62,50 @@ draw_to_main(struct wnw *window)
 		sub_index += 1;
 	}
 }
+
+void
+window_put_text(struct wnw *window, char *text, enum window_style style)
+{
+	int line_width, line_count, len;
+	
+	len = strlen(text);
+	switch (style) {
+		case WINDOW_STYLE_NONE:
+			if (window->width * window->height < len)
+				break;
+			memcpy(window->data, text, len);
+			break;
+		case WINDOW_STYLE_BORDERED_CENTER:
+			if ((window->width - 2) * (window->height - 2) < len) 
+				break;
+			line_width = window->width - 2;
+			line_count = len / line_width;
+			for (int i = 0; i <= line_count; i++) {
+				int data_offset = (i + 1) * window->width + 2;
+				int text_offset = i * line_width;
+				int count = MIN(len - text_offset, line_width);
+				int chars_before = (line_width - count) / 2;
+				data_offset += chars_before;
+				memcpy(window->data + data_offset, text + text_offset, count);  
+			}
+			break;
+		case WINDOW_STYLE_BORDERED:
+			if ((window->width - 2) * (window->height - 2) < len) 
+				break;
+			line_width = window->width - 2;
+			line_count = len / line_width;
+			for (int i = 0; i <= line_count; i++) {
+				int data_offset = (i + 1) * window->width + 2;
+				int text_offset = i * line_width;
+				int count = MIN(len - text_offset, line_width);
+				memcpy(window->data + data_offset, text + text_offset, count);  
+			}
+			break;
+		default:
+			break;
+	}
+}
+
 
 void
 print_main(void)

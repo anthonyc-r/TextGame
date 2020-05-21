@@ -81,10 +81,9 @@ void render_chat(struct wnw *window)
     }
     clear_window(window, '+');
     if (message) {
-        int len = strlen(message);
-        memcpy(window->data, message, len);
+		window_put_text(window, message, WINDOW_STYLE_BORDERED);
     } else {
-		memcpy(window->data, "no sounds", 9);
+		window_put_text(window, "no sounds", WINDOW_STYLE_BORDERED);
 	}
 }
 
@@ -129,6 +128,7 @@ window_test()
 	clear_window(test, '+');
 	char *text = "You do 10 damage.";
 	memcpy((test->data + 38), text, strlen(text));
+	window_put_text(test, text, WINDOW_STYLE_BORDERED_CENTER);
 	windows.num = 1;
 	windows.windows = test;
 }
