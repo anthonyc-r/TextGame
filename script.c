@@ -199,11 +199,7 @@ script_perform_creature(struct scrpt *script, struct ctr *creature)
 	}
 	script_reset(script);
     DEBUG_PRINT(("Generating speech for turn...\n"));
-    struct sound *sound = creature_consume_speech(creature);
-    if (sound) {
-        insert_sound(creature->map, sound);
-        DEBUG_PRINT(("Generated speech: %s\n", sound->type->text));
-    }
+	map_consume_speech(creature);
 	DEBUG_PRINT(("======== turn over: %s =========\n", creature->name));
 }
 
@@ -228,14 +224,11 @@ script_perform_line_creature(struct scrpt *script, struct ctr *creature, struct 
 		DEBUG_PRINT(("arg: %s\n", arg));
 	#endif
 	if (strcmp(op, "say") == 0) {
-        struct mem *memory = new_memory();
 		if (arg == NULL) {
-            memory_set_string(memory, "not implemented yet");
-            memory_push(&creature->speech, memory);
+            creature_say_str(creature, "noarg say not implemented yet.");
 			DEBUG_PRINT(("Invoked say noop\n"));
 		} else {
-			memory_set_string(memory, arg);
-            memory_push(&creature->speech, memory);
+			creature_say_str(creature, arg);
 			DEBUG_PRINT(("Invoked say (%s)\n", arg));
 		}
 		return TURN_CONTINUE;

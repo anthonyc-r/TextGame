@@ -189,6 +189,47 @@ insert_creature(struct map *map, struct ctr *creature, struct scrpt *script, str
 }
 
 void
+map_consume_speech(struct ctr *creature)
+{
+    char *text = NULL;
+    struct mem *speech = creature->speech;
+    char *strings[MAX_SPEECH_SIZE];
+    int lengths[MAX_SPEECH_SIZE];
+    int len = 0;
+    int i = 0;
+    do {
+        if (speech->type != MEM_TYPE_STRING)
+            continue;
+        strings[i] = speech->data.string.chars;
+        lengths[i] = strlen(strings[i]);
+        len += lengths[i];
+        DEBUG_PRINT(("Found string %s, length: %d\n", strings[i], lengths[i]));
+        i++;
+    } while (i < MAX_SPEECH_SIZE && (speech = speech->next));
+    if (i == 0)
+        return;
+    DEBUG_PRINT(("Found strings, count: %d, length: %d\n", i, len));
+    text = malloc(len + 1);
+    text[len] = 0;
+    for (i--, len = 0; i >= 0; i--) {
+        memcpy(&text[len], strings[i], lengths[i]);
+        len += lengths[i];
+    }
+    while ((speech = memory_pop(&creature->speech))) {
+        deinit_memory(speech);
+        free(speech);
+    }
+    struct sound_t *sound_type = malloc(sizeof(struct sound_t));
+    sound_type->id = "";
+    sound_type->text = text;
+    struct sound *sound = sound_creature(sound_type, creature);
+	if (sound) {
+		insert_sound(creature->map, sound);
+		DEBUG_PRINT(("Generated speech: %s\n", sound->type->text));
+	}
+}
+
+void
 destroy_inventory(struct ent *inventory)
 {
 	free(inventory);

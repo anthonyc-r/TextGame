@@ -18,6 +18,7 @@ struct wnw *main_window;
 struct wnw *map_window;
 struct wnw *info_window;
 struct wnw *chat_window;
+struct wnw *talk_window;
 
 struct wnw *new_window(int x, int y, int width, int height);
 void clear_window(struct wnw *window, char clear_char);

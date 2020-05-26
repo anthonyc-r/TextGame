@@ -4,6 +4,11 @@
 #include <stdbool.h>
 #include "vector.h"
 
+#define SPEECH_SIZE 100
+#define MAX_SPEECH_SIZE 20
+#define CREATURE_LOOK_ANGLE 0.1
+#define MAX_CREATURE_SIGHTINGS 5
+
 struct mem;
 struct ent;
 struct map;
@@ -34,5 +39,5 @@ bool creature_walk_toward(struct ctr *creature, struct ctr *other);
 struct ctr new_creature(char *name, char *desc, int health, int tp, size_t inventory_size);
 struct ctr** creature_look(struct ctr *creature);
 struct sound **creature_listen(struct ctr *creature);
-struct sound *creature_consume_speech(struct ctr *creatuere);
+void creature_say_str(struct ctr *creature, char *str);
 #endif

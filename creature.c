@@ -15,11 +15,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#define SPEECH_SIZE 100
-#define MAX_SPEECH_SIZE 20
-#define CREATURE_LOOK_ANGLE 0.1
-#define MAX_CREATURE_SIGHTINGS 5
-
 bool
 creature_walk_toward(struct ctr *creature, struct ctr *other)
 {
@@ -146,6 +141,14 @@ creature_look(struct ctr *creature)
 	ret[sightings] = NULL;
 	DEBUG_PRINT(("Found %d creatures\n", sightings));
 	return ret;
+}
+
+void
+creature_say_str(struct ctr *creature, char *str)
+{
+	struct mem *memory = new_memory();
+	memory_set_string(memory, str);
+	memory_push(&creature->speech, memory);
 }
 
 struct sound *

@@ -50,6 +50,7 @@ void insert_entity(struct map *map, struct ent entity, struct vector2i position)
 void insert_sound(struct map *map, struct sound *sound);
 void clear_sounds(struct map *map);
 struct ctr *insert_creature(struct map *map, struct ctr *creature, struct scrpt *script, struct vector2i position);
+void map_consume_speech(struct ctr *creature);
 void destroy_inventory(struct ent *inventory);
 char cell_to_char(struct cell *cel);
 struct cell *dir_to_cell(struct cell *cel, enum dir_t direction);

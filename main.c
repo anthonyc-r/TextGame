@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <stdbool.h>
 
 #include "debug.h"
 #include "rouge.h"
@@ -17,6 +18,11 @@
 #include "script.h"
 #include "gameloader.h"
 #include "memory.h"
+
+static bool draw_talk = false;
+static char talkbuf[100];
+static int talklen = 0;
+
 
 struct opt_windows {
 	int num;
@@ -53,10 +59,15 @@ init_data(void)
     
     chat_window = new_window(1, 16, 58, 3);
     clear_window(chat_window, '+');
+	
+	talk_window = new_window(10, 5, 40, 3);
+	clear_window(talk_window, '+');
+	
 	printf("game data init\n");
 }
 
-void render_info(struct wnw *window)
+void 
+render_info(struct wnw *window)
 {
 	size_t max_len = window->width * window->height; //Allow for null.
 	size_t actual_len = max_len + 1;
@@ -70,7 +81,8 @@ void render_info(struct wnw *window)
 	free(info_txt);
 }
 
-void render_chat(struct wnw *window)
+void 
+render_chat(struct wnw *window)
 {
     struct sound **soundlist = creature_listen(player);
     struct sound *sound;
@@ -85,6 +97,15 @@ void render_chat(struct wnw *window)
     } else {
 		window_put_text(window, "no sounds", WINDOW_STYLE_BORDERED);
 	}
+}
+
+void 
+render_talk(struct wnw *window)
+{
+	clear_window(window, '+');
+	talkbuf[talklen] = '\0';
+	window_put_text(window, talkbuf, WINDOW_STYLE_BORDERED);
+	memcpy(window->data + 3, "say", 3);
 }
 
 void
@@ -103,6 +124,11 @@ draw(struct map *map)
 	draw_to_main(info_window);
     render_chat(chat_window);
     draw_to_main(chat_window);
+	if (draw_talk) {
+		render_talk(talk_window);
+		draw_to_main(talk_window);
+	}
+	
 	for (int i = 0; i < windows.num; ++i) {
 		struct wnw tmp_wnw = windows.windows[i];
 		draw_to_main(&tmp_wnw);
@@ -134,27 +160,50 @@ window_test()
 }
 
 void
-perform_action(char *c)
+perform_action(char c)
 {
+	if (draw_talk) {
+		if ((c > 'a' && c < 'z') || c == ' ') {
+			talkbuf[talklen++] = c;
+		} else if (c == '\x7f') { // delete
+			if (talklen > 0)
+				talklen--;
+		} else if (c == '\n') {
+			talkbuf[talklen] = '\0';
+			creature_say_str(player, talkbuf);
+			map_consume_speech(player);
+			talklen = 0;
+			draw_talk = false;
+		} else if (c == '\x1b') { // escape
+			talklen = 0;
+			draw_talk = false;
+		}
+		return;
+	}
+	
 	enum dir_t dir;
-	switch (*c) {
+	switch (c) {
 		case 'w':
-			dir = NORTH;
+			creature_walk(player, NORTH);
 			break;
 		case 'a':
-			dir = WEST;
+			creature_walk(player, WEST);
 			break;
 		case 's':
-			dir = SOUTH;
+			creature_walk(player, SOUTH);
 			break;
 		case 'd':
-			dir = EAST;
+			creature_walk(player, EAST);
+			break;
+		case 't':
+			draw_talk = true;
 			break;
 		case 'm':
 			window_test();
 			return;
+		default:
+			break;
 	}
-	creature_walk(player, dir);
 }
 
 void
@@ -166,14 +215,9 @@ logic(struct map *map)
 	// get input
 	char c;
 	while ((c = getkey())) {
-		if (c < 97 || c > 122) {
-			systemspecific_sleep(1000);
-			continue;
-		} else {
-			printf("%c", c);
-			perform_action(&c);
-			break;
-		}
+		printf("%c", c);
+		perform_action(c);
+		break;
 	}
 	
 	for (int i = 0; i < map->creature_count; i++) {
