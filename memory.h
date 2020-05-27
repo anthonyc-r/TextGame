@@ -61,6 +61,7 @@ struct mem* memory_pop(struct mem **top);
 
 bool memory_eq_string(struct mem *memory, char *string);
 bool memory_eq_ctr(struct mem *memory, struct ctr *creature);
+bool memory_is_none(struct mem *memory);
 //bool memory_eq(struct mem *memory1, struct mem *memory2);
 
 void script_remember_creatures(struct scrpt *script, struct ctr **creatures);

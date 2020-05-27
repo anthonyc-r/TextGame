@@ -1,0 +1,36 @@
+ -state main
+look_creature
+set_state_cont search_player
+
+-state search_player
+recall
+if $player
+set_state_cont found_player
+if $none
+set_state main
+repeat
+
+-state found_player
+forget_all
+say Repeat the secret phrase, and you may pass.
+set_state listen_for_secret
+
+-state listen_for_secret
+listen
+set_state_cont search_hearing_for_key
+
+-state search_hearing_for_key
+recall
+if ZARUM MOG'TAR
+set_state_cont allow_passage
+if $none
+set_state listen_for_secret
+repeat
+
+-state allow_passage
+say You may proceed...
+move north
+set_state completed
+
+-state completed
+#finished

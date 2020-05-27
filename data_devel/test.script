@@ -2,7 +2,7 @@
 look_creature
 recall
 if Zoltan
-set_state testsay
+set_state_cont testsay
 say Testing !!
 say testing again !! woo
 

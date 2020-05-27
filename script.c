@@ -107,14 +107,22 @@ script_parse_line(struct scrpt *script, struct mem **stack, struct script_line *
 		script->current_line = script->state_locations[cstate].line_number;
 		DEBUG_PRINT(("Invoked -state\n"));
 		return TURN_END;
-	} else if (strcmp(op, "set_state") == 0) {
+	} else if (strncmp(op, "set_state", 9) == 0) {
 		//TODO: OPTIMIZE
+		// Ends turn by default, or when called with extra chars continues.
 		for (int i = 0; i < script->state_count; i++) {
 			struct scrpt_state_location *state = &script->state_locations[i];
 			if (strcmp(state->identifier, arg) == 0) {
 				script->current_state = i;
-				DEBUG_PRINT(("Invoked set_state %s\n", arg));
-				return TURN_END;
+				// Assume set_state_xyz is set_state_cont
+				if (opsz > 9) {
+					DEBUG_PRINT(("Invoked set_state_cont %s\n", arg));
+					script_reset(script);
+					return TURN_CONTINUE;
+				} else {
+					DEBUG_PRINT(("Invoked set_state %s\n", arg));
+					return TURN_END;
+				}
 			}
 		}
 		DEBUG_PRINT(("State identifier not found: %s\n", arg));
@@ -123,7 +131,18 @@ script_parse_line(struct scrpt *script, struct mem **stack, struct script_line *
 		return TURN_END;
 	} else if (strcmp(op, "if") == 0) {
 		DEBUG_PRINT(("Invoked if\n"));
-		if (!memory_eq_string(script->memory, arg))
+		// Handle special symbols [$player, $none]
+		bool cond = false;
+		if (arg[0] == '$') {
+			if (strcmp(arg, "$player") == 0) {
+				cond  = memory_eq_ctr(script->memory, player);
+			} else if (strcmp(arg, "$none") == 0) {
+				cond = memory_is_none(script->memory);
+			}
+		} else {
+			cond = memory_eq_string(script->memory, arg);
+		}
+		if (!cond)
 			script->current_line++;
 		return TURN_CONTINUE;
 	} else if (strcmp(op, "remember") == 0) {
@@ -154,6 +173,10 @@ script_parse_line(struct scrpt *script, struct mem **stack, struct script_line *
 		do {
 			deinit_memory(memory_pop(stack));
 		} while ((*stack)->next);
+		return TURN_CONTINUE;
+	} else if (strcmp(op, "repeat") == 0) {
+		DEBUG_PRINT(("repeat invoked\n"));
+		script_reset(script);
 		return TURN_CONTINUE;
 	} else {
 		return NO_MATCH;

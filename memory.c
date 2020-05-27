@@ -133,11 +133,17 @@ memory_eq_string(struct mem *memory, char *string)
 }
 
 bool
-memory_eq_creature(struct mem *memory, struct ctr *creature)
+memory_eq_ctr(struct mem *memory, struct ctr *creature)
 {
 	if (memory->type != MEM_TYPE_CREATURE)
 		return false;
 	return memory->data.creature.idx == creature->idx;
+}
+
+bool 
+memory_is_none(struct mem *memory)
+{
+	return memory->type == MEM_TYPE_NONE;
 }
 
 struct ctr *
