@@ -9,6 +9,7 @@
 #include "debug.h"
 #include "entity.h"
 #include "sound.h"
+#include "rouge.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -275,6 +276,22 @@ script_perform_line_creature(struct scrpt *script, struct ctr *creature, struct 
 			if (near_target) {
 				memory_set_string(script->memory, "DONE");
 			}
+		}
+		return TURN_CONTINUE;
+	} else if (strcmp(op, "move") == 0) {
+		switch (arg[0]) {
+			case 'n':
+				creature_walk(creature, NORTH);
+				break;
+			case 'e':
+				creature_walk(creature, EAST);
+				break;
+			case 's':
+				creature_walk(creature, SOUTH);
+				break;
+			case 'w':
+				creature_walk(creature, WEST);
+				break;
 		}
 		return TURN_CONTINUE;
 	} else {

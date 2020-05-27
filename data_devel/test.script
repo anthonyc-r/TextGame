@@ -9,6 +9,7 @@ say testing again !! woo
 -state testsay
 say Testing one
 say testing two
+move north
 
 -state prep
 forget_all
