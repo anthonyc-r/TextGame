@@ -3,13 +3,17 @@ look_creature
 recall
 if Zoltan
 set_state_cont testsay
-say Testing !!
-say testing again !! woo
 
 -state testsay
-say Testing one
-say testing two
+listen
+recall
+if password
+set_state_cont heard_password
+
+-state heard_password
+say you know the password, and may pass
 move north
+set_state main
 
 -state prep
 forget_all

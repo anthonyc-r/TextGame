@@ -191,10 +191,10 @@ script_perform_entity(struct scrpt *script, struct ent *entity)
 	struct script_line *line;
 	do {
 		line = &script->lines[script->current_line];
+		script->current_line++;
 		status = script_parse_line(script, &entity->memory, line);
 		if (status == NO_MATCH)
 			status = script_perform_line_entity(script, entity, line);
-		script->current_line++;
 	} while (status == TURN_CONTINUE);
 	if (status == NO_MATCH) {
 		DEBUG_PRINT(("Invalid operator in script\n"));
@@ -212,10 +212,10 @@ script_perform_creature(struct scrpt *script, struct ctr *creature)
 	struct script_line *line;
 	do {
 		line = &script->lines[script->current_line];
+		script->current_line++;
 		status = script_parse_line(script, &creature->memory, line);
 		if (status == NO_MATCH)
 			status = script_perform_line_creature(script, creature, line);
-		script->current_line++;
 	} while (status == TURN_CONTINUE);
 	if (status == NO_MATCH) {
 		DEBUG_PRINT(("Invalid operator in script\n"));
@@ -292,6 +292,16 @@ script_perform_line_creature(struct scrpt *script, struct ctr *creature, struct 
 			case 'w':
 				creature_walk(creature, WEST);
 				break;
+		}
+		return TURN_CONTINUE;
+	} else if (strcmp(op, "listen") == 0) {
+		struct sound **sounds = creature_listen(creature);
+		struct mem *memory;
+		struct sound *sound;
+		while ((sound = *sounds++) != NULL) {
+			memory = new_memory();
+			memory_set_sound(memory, sound);
+			memory_push(&creature->memory, memory);
 		}
 		return TURN_CONTINUE;
 	} else {

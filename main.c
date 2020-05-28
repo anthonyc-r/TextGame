@@ -89,6 +89,8 @@ render_chat(struct wnw *window)
     char *message = NULL;
     for (int i = 0; (sound = soundlist[i]); i++) {
         DEBUG_PRINT(("Found sounds!!\n"));
+		if (sound->source.creature == player)
+			continue;
         message = sound->type->text;
     }
     clear_window(window, '+');
