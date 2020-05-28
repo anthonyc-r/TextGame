@@ -1,4 +1,4 @@
- -state main
+-state main
 look_creature
 set_state_cont search_player
 
@@ -21,7 +21,7 @@ set_state_cont search_hearing_for_key
 
 -state search_hearing_for_key
 recall
-if ZARUM MOG'TAR
+if ZARUM MOGTAR
 set_state_cont allow_passage
 if $none
 set_state listen_for_secret
@@ -33,4 +33,5 @@ move north
 set_state completed
 
 -state completed
-#finished
+#nop
+

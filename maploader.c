@@ -44,7 +44,7 @@ load_map(char *filename)
 			char creature = getc(fp) - 1;
 			current_cell->ground = ground;
 			if (creature >= 0) {
-				struct scrpt *script = script_init("data_devel//test.script");
+				struct scrpt *script = script_init("data_devel//gatekeeper_1.script");
 				struct vector2i position = { j, i };
 				insert_creature(map, &all_creatures[(int) creature], script, position);
 			}

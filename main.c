@@ -165,7 +165,7 @@ void
 perform_action(char c)
 {
 	if (draw_talk) {
-		if ((c >= 'a' && c <= 'z') || c == ' ') {
+		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ' ') {
 			talkbuf[talklen++] = c;
 		} else if (c == '\x7f') { // delete
 			if (talklen > 0)

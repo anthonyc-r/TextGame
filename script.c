@@ -158,10 +158,12 @@ script_parse_line(struct scrpt *script, struct mem **stack, struct script_line *
 		return TURN_CONTINUE;
 	} else if (strcmp(op, "recall") == 0) {
 		struct mem *mem = memory_pop(stack);
+		deinit_memory(script->memory);
 		if (mem) {
-			deinit_memory(script->memory);
-            		//free(script->memory);
+			//free(script->memory);
 			script->memory = mem;
+		} else {
+			script->memory = new_memory(); // none
 		}
 		DEBUG_PRINT(("Invoked recall\n"));
 		return TURN_CONTINUE;
@@ -171,9 +173,10 @@ script_parse_line(struct scrpt *script, struct mem **stack, struct script_line *
 		return TURN_CONTINUE;
 	} else if (strcmp(op, "forget_all") == 0) {
 		DEBUG_PRINT(("forget_all invoked\n"));
-		do {
-			deinit_memory(memory_pop(stack));
-		} while ((*stack)->next);
+		struct mem *memory;
+		while ((memory = memory_pop(stack))) {
+			deinit_memory(memory);
+		} 
 		return TURN_CONTINUE;
 	} else if (strcmp(op, "repeat") == 0) {
 		DEBUG_PRINT(("repeat invoked\n"));
