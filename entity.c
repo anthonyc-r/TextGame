@@ -14,16 +14,25 @@ entity_blocking(struct ent *entity)
 	}
 }
 
+struct ent*
+init_entity(struct ent *entity, char *name, char *desc, char icon, int weight, enum size_type size)
+{
+	entity->idx = -1;
+	entity->name = name;
+	entity->desc = desc;
+	entity->icon = icon;
+	entity->weight = weight;
+	entity->size = size;
+	entity->next = NULL;
+	entity->prev = NULL;
+	return entity;
+}
+
 struct ent
 new_entity(char *name, char *desc, char icon, int weight, enum size_type size)
 {
 	struct ent entity;
-	entity.idx = -1;
-	entity.name = name;
-	entity.desc = desc;
-	entity.icon = icon;
-	entity.weight = weight;
-	entity.size = size;
+	init_entity(&entity, name, desc, icon, weight, size);
 	return entity;
 }
 

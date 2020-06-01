@@ -14,6 +14,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 bool
 creature_walk_toward(struct ctr *creature, struct ctr *other)
@@ -91,7 +92,7 @@ creature_walk(struct ctr *creature, enum dir_t direction)
 }
 
 struct ctr
-new_creature(char *name, char *desc, int health, int tp, size_t inventory_size)
+new_creature(char *name, char *desc, int health, int tp, size_t inventory_max)
 {
 	struct ctr creature;
 	creature.idx = -1;
@@ -101,9 +102,10 @@ new_creature(char *name, char *desc, int health, int tp, size_t inventory_size)
 	creature.desc = desc;
 	creature.health = health;
 	creature.tp = tp;
-	creature.inventory_size = inventory_size;
+	creature.inventory_max = inventory_max;
+	creature.inventory_size = 0;
     creature.hearing = 5;
-	creature.inventory = malloc(sizeof (struct ent) * inventory_size);
+	creature.inventory = malloc(sizeof (struct ent*) * inventory_max);
     creature.script = NULL;
     creature.map = NULL;
 	return creature;
@@ -218,4 +220,15 @@ creature_listen(struct ctr *creature)
     sounds = realloc(sounds, (count + 1) * sizeof(struct sound*));
     sounds[count] = NULL;
     return sounds;
+}
+
+bool
+creature_accept_item(struct ctr *creature, struct ent *item)
+{
+	if (creature->inventory_size >= creature->inventory_max) {
+		// inventory full
+		return false;
+	}
+	creature->inventory[(creature->inventory_size)++] = item;
+	return true;
 }

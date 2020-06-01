@@ -25,8 +25,12 @@ struct ent {
     struct map *map;
 	enum size_type size;
 	struct mem *memory;
+	// list
+	struct ent *next;
+	struct ent *prev;
 } *all_entities;
 
+struct ent* init_entity(struct ent *entity, char *name, char *desc, char icon, int weight, enum size_type size);
 struct ent new_entity(char *name, char *desc, char icon, int weight, enum size_type size);
 int entity_blocking(struct ent *entity);
 enum size_type entity_size(char *string);

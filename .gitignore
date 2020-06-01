@@ -1,3 +1,4 @@
 obj/
 main
+.kateproject
 valgrind-out.txt

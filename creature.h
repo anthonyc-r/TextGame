@@ -23,10 +23,11 @@ struct ctr {
     int health;
 	int tp;
 	int inventory_size;
+	int inventory_max;
     char *name;
 	char *desc;
     int hearing;
-    struct ent *inventory;
+    struct ent **inventory;
 	struct map *map;
 	struct scrpt *script;
 	struct mem *speech;
@@ -36,8 +37,9 @@ struct ctr {
 
 void creature_walk(struct ctr *creature, enum dir_t direction);
 bool creature_walk_toward(struct ctr *creature, struct ctr *other);
-struct ctr new_creature(char *name, char *desc, int health, int tp, size_t inventory_size);
+struct ctr new_creature(char *name, char *desc, int health, int tp, size_t inventory_max);
 struct ctr** creature_look(struct ctr *creature);
 struct sound **creature_listen(struct ctr *creature);
 void creature_say_str(struct ctr *creature, char *str);
+bool creature_accept_item(struct ctr *creature, struct ent *item);
 #endif

@@ -149,18 +149,31 @@ void
 insert_entity(struct map *map, struct ent entity, struct vector2i position)
 {
     struct cell *cel = get_cell(map, &position);
-	int sz = cel->inventory_size;
-	struct ent entity_copy = entity;
-    entity_copy.position = position;
-	entity_copy.map = map;
-    struct ent *inv = cel->inventory;
+	struct ent *entity_copy = init_entity(malloc(sizeof (struct ent)), entity.name, entity.desc, entity.icon, entity.weight, entity.size);
+    entity_copy->position = position;
+	entity_copy->map = map;
 	
-	struct ent *newinv = malloc(sizeof (struct ent) * (sz + 1));
-	memcpy(newinv, inv, sizeof (struct ent) * sz);
-	newinv[sz] = entity_copy;
-	cel->inventory = newinv;
-	cel->inventory_size = sz + 1;
-	destroy_inventory(inv);
+	entity_copy->prev = NULL;
+	entity_copy->next = cel->inventory;
+	cel->inventory->prev = entity_copy;
+	
+	cel->inventory = entity_copy;
+	cel->inventory_size += 1;
+}
+
+void
+map_remove_entity(struct ent *entity)
+{
+	struct cell *cell = get_cell(entity->map, &entity->position);
+	if (entity->prev == NULL) {
+		cell->inventory = entity->next;
+	} else {
+		entity->prev->next = entity->next;
+	}
+	entity->position = (struct vector2i){ 0, 0 };
+	entity->map = NULL;
+	entity->prev = NULL;
+	entity->next = NULL;
 }
 
 struct ctr*
@@ -229,11 +242,6 @@ map_consume_speech(struct ctr *creature)
 	}
 }
 
-void
-destroy_inventory(struct ent *inventory)
-{
-	free(inventory);
-}
 
 char
 cell_to_char(struct cell *cel)
