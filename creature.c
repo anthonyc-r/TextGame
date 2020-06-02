@@ -190,6 +190,20 @@ creature_consume_speech(struct ctr *creature)
     return sound_creature(sound_type, creature);
 }
 
+void
+clip_vec(struct map *map, struct vector2i *v)
+{	
+	if (v->x < 0)
+		v->x = 0;
+	else if (v->x >= map->width)
+		v->x = map->width - 1;
+	
+	if (v->y < 0)
+		v->y = 0;
+	else if (v->y >= map->height)
+		v->y = map->height - 1;
+}
+
 // Returns an array of references to sounds. The map struct owns these sounds.
 struct sound **
 creature_listen(struct ctr *creature)
@@ -200,14 +214,12 @@ creature_listen(struct ctr *creature)
         creature->position.x - creature->hearing,
         creature->position.y - creature->hearing
     };
-	topleft.x = MAX(0, topleft.x);
-	topleft.y = MAX(0, topleft.y);
+	clip_vec(map, &topleft);
     struct vector2i bottomright = {
         creature->position.x + creature->hearing,
         creature->position.y + creature->hearing
     };
-	bottomright.x = MIN(map->width - 1, bottomright.x);
-	bottomright.y = MIN(map->height - 1, bottomright.y);
+	clip_vec(map, &bottomright);
     int count = 0;
     for (int i = topleft.x; i <= bottomright.x; i++) {
         for (int j = topleft.y; j <= bottomright.y; j++) {
@@ -232,3 +244,27 @@ creature_accept_item(struct ctr *creature, struct ent *item)
 	creature->inventory[(creature->inventory_size)++] = item;
 	return true;
 }
+/*
+int
+creature_search_items(struct ctr *creature, struct ent *dst, int max_items)
+{
+	int prange = 1;
+	struct vector2i topleft = {
+		creature->position.x - prange,
+		creature->position.y - prange
+	};
+	struct vector2i bottomright = {
+		creature->position.x + prange,
+		creature->position.y + prange
+	};
+	clip_vec(creature->map, &topleft);
+	cip_vec(creature->map, &bottomright);
+	for (int i = topleft.x; i <= bottomright.x; i++) {
+		for (int j = topleft.y; j <= bottomright.y; j++) {
+			struct vector2i pos = { i, j };
+			struct cell *cell = get_cell(map, &pos);
+			while (cell->inventory
+		}
+	}
+}
+*/

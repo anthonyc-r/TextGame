@@ -42,4 +42,6 @@ struct ctr** creature_look(struct ctr *creature);
 struct sound **creature_listen(struct ctr *creature);
 void creature_say_str(struct ctr *creature, char *str);
 bool creature_accept_item(struct ctr *creature, struct ent *item);
+int creature_search_items(struct ctr *creature, struct ent *dst);
+
 #endif

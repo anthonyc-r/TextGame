@@ -59,7 +59,10 @@ init_data(void)
 	talk_window = new_window(10, 5, 40, 3);
 	clear_window(talk_window, '+');
 	
-	tui_info = (struct tui_info) { TUI_MODE_WALK, "", 0 };
+	pickup_window = new_window(10, 5, 20, 10);
+	clear_window(pickup_window, '+');
+	
+	tui_info = (struct tui_info) { TUI_MODE_WALK, "", 0, 0, 0 };
 	printf("game data init\n");
 }
 
@@ -108,6 +111,14 @@ render_talk(struct wnw *window)
 }
 
 void
+render_pickup(int n, struct ent **items)
+{
+	for (int i = 0; i < n; i++) {
+		printf("add item\n");
+	}
+}
+
+void
 draw(struct map *map)
 {
 	DEBUG_PRINT(("Draw\n"));
@@ -126,6 +137,9 @@ draw(struct map *map)
 	if (tui_info.mode == TUI_MODE_TALK) {
 		render_talk(talk_window);
 		draw_to_main(talk_window);
+	}
+	if (tui_info.mode == TUI_MODE_PICKUP) {
+		draw_to_main(pickup_window);
 	}
 	
 	for (int i = 0; i < windows.num; ++i) {
@@ -179,6 +193,7 @@ perform_action_walk(char c)
 			break;
 		case 'p':
 			tui_info.mode = TUI_MODE_PICKUP;
+			// tui_info.piclist = creature_search_items(player);
 			break;
 		case 'm':
 			window_test();
@@ -210,6 +225,12 @@ perform_action_talk(char c)
 }
 
 void
+perform_action_pickup(char c)
+{
+	
+}
+
+void
 perform_action(char c)
 {
 	switch (tui_info.mode) {
@@ -220,6 +241,7 @@ perform_action(char c)
 			perform_action_talk(c);
 			break;
 		case TUI_MODE_PICKUP:
+			perform_action_pickup(c);
 			break;
 	}	
 }
