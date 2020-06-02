@@ -155,8 +155,9 @@ insert_entity(struct map *map, struct ent entity, struct vector2i position)
 	
 	entity_copy->prev = NULL;
 	entity_copy->next = cel->inventory;
-	cel->inventory->prev = entity_copy;
-	
+	if (cel->inventory) {
+		cel->inventory->prev = entity_copy;
+	}
 	cel->inventory = entity_copy;
 	cel->inventory_size += 1;
 }

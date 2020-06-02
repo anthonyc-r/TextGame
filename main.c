@@ -18,11 +18,7 @@
 #include "script.h"
 #include "gameloader.h"
 #include "memory.h"
-
-static bool draw_talk = false;
-static char talkbuf[100];
-static int talklen = 0;
-
+#include "textui.h"
 
 struct opt_windows {
 	int num;
@@ -63,6 +59,7 @@ init_data(void)
 	talk_window = new_window(10, 5, 40, 3);
 	clear_window(talk_window, '+');
 	
+	tui_info = (struct tui_info) { TUI_MODE_WALK, "", 0 };
 	printf("game data init\n");
 }
 
@@ -105,8 +102,8 @@ void
 render_talk(struct wnw *window)
 {
 	clear_window(window, '+');
-	talkbuf[talklen] = '\0';
-	window_put_text(window, talkbuf, WINDOW_STYLE_BORDERED);
+	tui_info.talkbuf[tui_info.talklen] = '\0';
+	window_put_text(window, tui_info.talkbuf, WINDOW_STYLE_BORDERED);
 	memcpy(window->data + 3, "say", 3);
 }
 
@@ -126,7 +123,7 @@ draw(struct map *map)
 	draw_to_main(info_window);
     render_chat(chat_window);
     draw_to_main(chat_window);
-	if (draw_talk) {
+	if (tui_info.mode == TUI_MODE_TALK) {
 		render_talk(talk_window);
 		draw_to_main(talk_window);
 	}
@@ -162,28 +159,8 @@ window_test()
 }
 
 void
-perform_action(char c)
+perform_action_walk(char c)
 {
-	if (draw_talk) {
-		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ' ') {
-			talkbuf[talklen++] = c;
-		} else if (c == '\x7f') { // delete
-			if (talklen > 0)
-				talklen--;
-		} else if (c == '\n') {
-			talkbuf[talklen] = '\0';
-			creature_say_str(player, talkbuf);
-			map_consume_speech(player);
-			talklen = 0;
-			draw_talk = false;
-		} else if (c == '\x1b') { // escape
-			talklen = 0;
-			draw_talk = false;
-		}
-		return;
-	}
-	
-	enum dir_t dir;
 	switch (c) {
 		case 'w':
 			creature_walk(player, NORTH);
@@ -198,7 +175,10 @@ perform_action(char c)
 			creature_walk(player, EAST);
 			break;
 		case 't':
-			draw_talk = true;
+			tui_info.mode = TUI_MODE_TALK;
+			break;
+		case 'p':
+			tui_info.mode = TUI_MODE_PICKUP;
 			break;
 		case 'm':
 			window_test();
@@ -206,6 +186,42 @@ perform_action(char c)
 		default:
 			break;
 	}
+}
+
+void
+perform_action_talk(char c)
+{
+	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ' ') {
+		tui_info.talkbuf[tui_info.talklen++] = c;
+	} else if (c == '\x7f') { // delete
+		if (tui_info.talklen > 0)
+			tui_info.talklen--;
+	} else if (c == '\n') {
+		tui_info.talkbuf[tui_info.talklen] = '\0';
+		creature_say_str(player, tui_info.talkbuf);
+		map_consume_speech(player);
+		tui_info.talklen = 0;
+		tui_info.mode = TUI_MODE_WALK;
+	} else if (c == '\x1b') { // escape
+		tui_info.talklen = 0;
+		tui_info.mode = TUI_MODE_WALK;
+	}
+	return;	
+}
+
+void
+perform_action(char c)
+{
+	switch (tui_info.mode) {
+		case TUI_MODE_WALK:
+			perform_action_walk(c);
+			break;
+		case TUI_MODE_TALK:
+			perform_action_talk(c);
+			break;
+		case TUI_MODE_PICKUP:
+			break;
+	}	
 }
 
 void
