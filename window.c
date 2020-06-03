@@ -106,6 +106,26 @@ window_put_text(struct wnw *window, char *text, enum window_style style)
 	}
 }
 
+void
+window_put_line(struct wnw *window, char *text, int line, enum window_style style)
+{
+	int maxh = window->height;
+	int maxw = window->width;
+	int indent = 0;
+	if (style == WINDOW_STYLE_BORDERED || style == WINDOW_STYLE_BORDERED_CENTER) {
+		maxh -= 1;
+		maxw -= 1;
+		indent = 1;
+	}
+	if (line >= maxh)
+		return;
+	int len = MIN(maxw, strlen(text));
+	int offset = line * (window->width + 1) + indent;
+	if (style == WINDOW_STYLE_BORDERED_CENTER) {
+		offset += (maxw - len) / 2;
+	}
+	memcpy(window->data + offset, text, len);
+}
 
 void
 print_main(void)

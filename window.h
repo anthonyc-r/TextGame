@@ -26,5 +26,6 @@ void clear_window(struct wnw *window, char clear_char);
 void destroy_window(struct wnw *window);
 void draw_to_main(struct wnw *window);
 void window_put_text(struct wnw *window, char *text, enum window_style style);
+void window_put_line(struct wnw *window, char *text, int line, enum window_style style);
 void print_main(void);
 #endif

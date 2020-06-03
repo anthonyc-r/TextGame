@@ -19,6 +19,7 @@
 #include "gameloader.h"
 #include "memory.h"
 #include "textui.h"
+#include "entity.h"
 
 struct opt_windows {
 	int num;
@@ -111,10 +112,17 @@ render_talk(struct wnw *window)
 }
 
 void
-render_pickup(int n, struct ent **items)
+render_pickup(struct wnw *window)
 {
-	for (int i = 0; i < n; i++) {
-		printf("add item\n");
+	clear_window(window, '+');
+	memcpy(window->data + 3, "pick up", 7);
+	window_put_line(window, "q) quit", 1, WINDOW_STYLE_BORDERED);
+	for (int i = 0; i < tui_info.picount; i++) {
+		char *name = tui_info.piclist[i].name;
+		char entry[strlen(name) + 3];
+		// todo: - make work for more items...
+		sprintf(entry, "%c) %s", 'a' + i, name);
+		window_put_line(window, entry, i + 2, WINDOW_STYLE_BORDERED);
 	}
 }
 
@@ -139,6 +147,7 @@ draw(struct map *map)
 		draw_to_main(talk_window);
 	}
 	if (tui_info.mode == TUI_MODE_PICKUP) {
+		render_pickup(pickup_window);
 		draw_to_main(pickup_window);
 	}
 	
@@ -193,7 +202,9 @@ perform_action_walk(char c)
 			break;
 		case 'p':
 			tui_info.mode = TUI_MODE_PICKUP;
-			// tui_info.piclist = creature_search_items(player);
+			tui_info.picount = creature_search_items(player, NULL);
+			tui_info.piclist = malloc(tui_info.picount * sizeof (struct ent));
+			creature_search_items(player, &tui_info.piclist);
 			break;
 		case 'm':
 			window_test();
@@ -227,7 +238,25 @@ perform_action_talk(char c)
 void
 perform_action_pickup(char c)
 {
-	
+	if (c == 'q') {
+		tui_info.mode = TUI_MODE_WALK;
+		tui_info.picount = 0;
+		if (tui_info.piclist != NULL) {
+			free(tui_info.piclist);
+			tui_info.piclist = NULL;
+		}
+	} else {
+		int idx = c - 'a';
+		if (idx < 0 || idx >= tui_info.picount) {
+			return;
+		}
+		struct ent *item = tui_info.piclist + idx;
+		if (creature_take_entity(player, item)) {
+			map_remove_entity(item);
+		} else {
+			// todo: indicate empty inv!
+		}
+	}
 }
 
 void

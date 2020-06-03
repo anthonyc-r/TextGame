@@ -41,7 +41,7 @@ struct ctr new_creature(char *name, char *desc, int health, int tp, size_t inven
 struct ctr** creature_look(struct ctr *creature);
 struct sound **creature_listen(struct ctr *creature);
 void creature_say_str(struct ctr *creature, char *str);
-bool creature_accept_item(struct ctr *creature, struct ent *item);
-int creature_search_items(struct ctr *creature, struct ent *dst);
+bool creature_take_entity(struct ctr *creature, struct ent *item);
+int creature_search_items(struct ctr *creature, struct ent **dst);
 
 #endif

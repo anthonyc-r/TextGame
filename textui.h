@@ -16,7 +16,7 @@ struct tui_info {
 	char talkbuf[100];
 	int talklen;
 	
-	struct entity *piclist;
+	struct ent *piclist;
 	int picount;
 } tui_info;
 

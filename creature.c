@@ -235,7 +235,7 @@ creature_listen(struct ctr *creature)
 }
 
 bool
-creature_accept_item(struct ctr *creature, struct ent *item)
+creature_take_entity(struct ctr *creature, struct ent *item)
 {
 	if (creature->inventory_size >= creature->inventory_max) {
 		// inventory full
@@ -244,11 +244,14 @@ creature_accept_item(struct ctr *creature, struct ent *item)
 	creature->inventory[(creature->inventory_size)++] = item;
 	return true;
 }
-/*
+
+// Put all the items nearby into dst if non null & return number of items nearby
 int
-creature_search_items(struct ctr *creature, struct ent *dst, int max_items)
+creature_search_items(struct ctr *creature, struct ent **dst)
 {
 	int prange = 1;
+	int count = 0;
+	struct map *map = creature->map;
 	struct vector2i topleft = {
 		creature->position.x - prange,
 		creature->position.y - prange
@@ -257,14 +260,23 @@ creature_search_items(struct ctr *creature, struct ent *dst, int max_items)
 		creature->position.x + prange,
 		creature->position.y + prange
 	};
-	clip_vec(creature->map, &topleft);
-	cip_vec(creature->map, &bottomright);
+	clip_vec(map, &topleft);
+	clip_vec(map, &bottomright);
 	for (int i = topleft.x; i <= bottomright.x; i++) {
 		for (int j = topleft.y; j <= bottomright.y; j++) {
 			struct vector2i pos = { i, j };
 			struct cell *cell = get_cell(map, &pos);
-			while (cell->inventory
+			if (dst != NULL) {
+				struct ent *item = cell->inventory;
+				while (item != NULL) {
+					dst[count++] = item;
+					item = item->next;
+				}
+			} else {
+				count += cell->inventory_size;
+			}
 		}
 	}
+	return count;
 }
-*/
+
