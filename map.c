@@ -175,6 +175,7 @@ map_remove_entity(struct ent *entity)
 	entity->map = NULL;
 	entity->prev = NULL;
 	entity->next = NULL;
+	cell->inventory_size--;
 }
 
 struct ctr*
@@ -192,7 +193,8 @@ insert_creature(struct map *map, struct ctr *creature, struct scrpt *script, str
     strcpy(new_creature->name, creature->name);
     new_creature->desc = malloc(strlen(creature->desc) + 1);
     strcpy(new_creature->desc, creature->desc);
-    new_creature->inventory = NULL;
+	new_creature->inventory_max = creature->inventory_max;
+    new_creature->inventory = malloc(sizeof (struct ent*) * creature->inventory_max);
     new_creature->map = map;
     new_creature->script = script;
     new_creature->speech = new_memory();

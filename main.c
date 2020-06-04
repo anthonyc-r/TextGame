@@ -40,7 +40,7 @@ init_data(void)
     struct vector2i plr_position;
     plr_position.x = 14;
     plr_position.y = 13;
-	struct ctr plr = new_creature("Zoltan", "Powerful mage", 100, 100, 0);
+	struct ctr plr = new_creature("Zoltan", "Powerful mage", 100, 100, 2);
 	plr.hearing = 5;
 	player = insert_creature(active_map, &plr, NULL, plr_position);
 	DEBUG_PRINT(("done inserting test objects\n"));
@@ -60,7 +60,7 @@ init_data(void)
 	talk_window = new_window(10, 5, 40, 3);
 	clear_window(talk_window, '+');
 	
-	pickup_window = new_window(10, 5, 20, 10);
+	pickup_window = new_window(20, 4, 20, 12);
 	clear_window(pickup_window, '+');
 	
 	tui_info = (struct tui_info) { TUI_MODE_WALK, "", 0, 0, 0 };
@@ -94,8 +94,12 @@ render_chat(struct wnw *window)
 			continue;
         message = sound->type->text;
     }
-    clear_window(window, '+');
-    if (message) {
+    clear_window(window, ' ');
+    window_fill_border(window, '-');
+	if (tui_info.status[0] != '\0') {
+		window_put_text(window, tui_info.status, WINDOW_STYLE_BORDERED_CENTER);
+		tui_info.status[0] = '\0';
+	} else if (message) {
 		window_put_text(window, message, WINDOW_STYLE_BORDERED);
     } else {
 		window_put_text(window, "no sounds", WINDOW_STYLE_BORDERED);
@@ -107,6 +111,7 @@ render_talk(struct wnw *window)
 {
 	clear_window(window, '+');
 	tui_info.talkbuf[tui_info.talklen] = '\0';
+	window_fill_border(window, ' ');
 	window_put_text(window, tui_info.talkbuf, WINDOW_STYLE_BORDERED);
 	memcpy(window->data + 3, "say", 3);
 }
@@ -115,6 +120,7 @@ void
 render_pickup(struct wnw *window)
 {
 	clear_window(window, '+');
+	window_fill_border(window, ' ');
 	memcpy(window->data + 3, "pick up", 7);
 	window_put_line(window, "q) quit", 1, WINDOW_STYLE_BORDERED);
 	for (int i = 0; i < tui_info.picount; i++) {
@@ -254,8 +260,9 @@ perform_action_pickup(char c)
 		if (creature_take_entity(player, item)) {
 			map_remove_entity(item);
 		} else {
-			// todo: indicate empty inv!
+			memcpy(tui_info.status, "inventory full!", 16);
 		}
+		tui_info.mode = TUI_MODE_WALK;
 	}
 }
 

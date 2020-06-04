@@ -128,6 +128,20 @@ window_put_line(struct wnw *window, char *text, int line, enum window_style styl
 }
 
 void
+window_fill_border(struct wnw *window, char b) {
+	// + newlines...
+	int maxidx = ((window->width + 1) * window->height) - 1;
+	for (int i = 0; i < window->width; i++) {
+		window->data[i] = b;
+		window->data[maxidx - i] = b;
+	}
+	for (int i = 0; i < maxidx; i += window->width + 1) {
+		window->data[i] = b;
+		window->data[i + window->width - 1] = b;
+	}
+}
+
+void
 print_main(void)
 {
 	printf("%s", main_window->data);

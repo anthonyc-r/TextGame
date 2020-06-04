@@ -18,6 +18,8 @@ struct tui_info {
 	
 	struct ent *piclist;
 	int picount;
+	
+	char status[100];
 } tui_info;
 
 #endif
