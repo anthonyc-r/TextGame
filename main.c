@@ -21,6 +21,8 @@
 #include "textui.h"
 #include "entity.h"
 
+#define CH_ESCAPE '\x1b'
+
 struct opt_windows {
 	int num;
 	struct wnw *windows;
@@ -125,13 +127,12 @@ render_pickup(struct wnw *window)
 	clear_window(window, ' ');
 	window_fill_border(window, '0');
 	memcpy(window->data + 3, "pick up", 7);
-	window_put_line(window, "q) quit", 1, WINDOW_STYLE_BORDERED);
 	for (int i = 0; i < tui_info.picount; i++) {
 		char *name = tui_info.piclist[i].name;
 		char entry[strlen(name) + 3];
 		// todo: - make work for more items...
 		sprintf(entry, "%c) %s", 'a' + i, name);
-		window_put_line(window, entry, i + 2, WINDOW_STYLE_BORDERED);
+		window_put_line(window, entry, i + 1, WINDOW_STYLE_BORDERED);
 	}
 }
 
@@ -141,7 +142,10 @@ render_inv(struct wnw *window)
 	clear_window(window, ' ');
 	window_fill_border(window, '-');
 	memcpy(window->data + 3, "inventory", 9);
-	
+	for (int i = 0; i < player->inventory_size; i++) {
+		char *name = player->inventory[i]->name;
+		window_put_line(window, name, i + 1, WINDOW_STYLE_BORDERED);
+	}
 }
 
 void
@@ -250,7 +254,7 @@ perform_action_talk(char c)
 		map_consume_speech(player);
 		tui_info.talklen = 0;
 		tui_info.mode = TUI_MODE_WALK;
-	} else if (c == '\x1b') { // escape
+	} else if (c == CH_ESCAPE) {
 		tui_info.talklen = 0;
 		tui_info.mode = TUI_MODE_WALK;
 	}
@@ -260,7 +264,7 @@ perform_action_talk(char c)
 void
 perform_action_pickup(char c)
 {
-	if (c == 'q') {
+	if (c == CH_ESCAPE) {
 		tui_info.mode = TUI_MODE_WALK;
 		tui_info.picount = 0;
 		if (tui_info.piclist != NULL) {
