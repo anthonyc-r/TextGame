@@ -128,7 +128,7 @@ creature_look(struct ctr *creature)
 		for (float j = radius_start; j < 1.0; j += radius_incr) { 
 			struct vector2i p = vector2f_round(vector2f_along(origin, dest, j));
 			struct cell *c = get_cell(creature->map, &p);
-			if (c->creature != NULL) {
+			if (c != NULL && c->creature != NULL) {
 				if (sightings < 1 || ret[sightings - 1] != c->creature) {
 					DEBUG_PRINT(("Found creature name: %s\n", c->creature->name));
 					ret[sightings++] = c->creature;

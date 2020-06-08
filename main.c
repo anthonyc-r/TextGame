@@ -35,11 +35,11 @@ init_data(void)
 	windows.num = 0;
 	//init game data
 	load_game("data//game.dat");
-    active_map = load_map("data//map.dat");
+    active_map = load_map("data//map2.dat");
     DEBUG_PRINT(("Load game, load map, done.\n"));
     struct vector2i plr_position;
-    plr_position.x = 14;
-    plr_position.y = 13;
+    plr_position.x = 10;
+    plr_position.y = 10;
 	struct ctr plr = new_creature("Zoltan", "Powerful mage", 100, 100, 2);
 	plr.hearing = 5;
 	player = insert_creature(active_map, &plr, NULL, plr_position);
