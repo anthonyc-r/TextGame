@@ -46,7 +46,7 @@ init_data(void)
 	DEBUG_PRINT(("done inserting test objects\n"));
 	//init display data
     main_window = new_window(0, 0, 60, 20);
-	clear_window(main_window, '|');
+	clear_window(main_window, '*');
 	
     map_window = new_window(0, 0, 40, 15);
 	clear_window(map_window, ' ');
@@ -54,8 +54,11 @@ init_data(void)
     info_window = new_window(25, 0, 25, 2);
 	clear_window(info_window, ' ');
     
-    chat_window = new_window(1, 16, 58, 3);
+    chat_window = new_window(0, 15, 60, 5);
     clear_window(chat_window, '+');
+	
+	inv_window = new_window(40, 2, 20, 14);
+	clear_window(inv_window, ' ');
 	
 	talk_window = new_window(10, 5, 40, 3);
 	clear_window(talk_window, '+');
@@ -109,9 +112,9 @@ render_chat(struct wnw *window)
 void 
 render_talk(struct wnw *window)
 {
-	clear_window(window, '+');
+	clear_window(window, ' ');
 	tui_info.talkbuf[tui_info.talklen] = '\0';
-	window_fill_border(window, ' ');
+	window_fill_border(window, '0');
 	window_put_text(window, tui_info.talkbuf, WINDOW_STYLE_BORDERED);
 	memcpy(window->data + 3, "say", 3);
 }
@@ -119,8 +122,8 @@ render_talk(struct wnw *window)
 void
 render_pickup(struct wnw *window)
 {
-	clear_window(window, '+');
-	window_fill_border(window, ' ');
+	clear_window(window, ' ');
+	window_fill_border(window, '0');
 	memcpy(window->data + 3, "pick up", 7);
 	window_put_line(window, "q) quit", 1, WINDOW_STYLE_BORDERED);
 	for (int i = 0; i < tui_info.picount; i++) {
@@ -133,13 +136,22 @@ render_pickup(struct wnw *window)
 }
 
 void
+render_inv(struct wnw *window)
+{
+	clear_window(window, ' ');
+	window_fill_border(window, '-');
+	memcpy(window->data + 3, "inventory", 9);
+	
+}
+
+void
 draw(struct map *map)
 {
 	DEBUG_PRINT(("Draw\n"));
     struct vector2i view_from = {player->position.x - map_window->width / 2, player->position.y - map_window->height / 2};
     struct vector2i view_to = {view_from.x + map_window->width, view_from.y + map_window->height};
 	//clear
-	clear_window(main_window, '|');
+	clear_window(main_window, ' ');
 	systemspecific_clear();
 	//redraw
     render_map(map, map_window, &view_from, &view_to);
@@ -148,6 +160,10 @@ draw(struct map *map)
 	draw_to_main(info_window);
     render_chat(chat_window);
     draw_to_main(chat_window);
+	render_inv(inv_window);
+	draw_to_main(inv_window);
+	
+	
 	if (tui_info.mode == TUI_MODE_TALK) {
 		render_talk(talk_window);
 		draw_to_main(talk_window);
