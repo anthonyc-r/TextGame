@@ -136,7 +136,7 @@ void
 draw(struct map *map)
 {
 	DEBUG_PRINT(("Draw\n"));
-    struct vector2i view_from = {player->position.x - 5, player->position.y - 5};
+    struct vector2i view_from = {player->position.x - map_window->width / 2, player->position.y - map_window->height / 2};
     struct vector2i view_to = {view_from.x + map_window->width, view_from.y + map_window->height};
 	//clear
 	clear_window(main_window, '|');
