@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#define PROPOSAL_ATTACK "+ATTACK"
+#define ACCEPT_DEFEND "-DEFEND"
+
 struct mem;
 struct ent;
 struct ctr;
@@ -42,6 +45,8 @@ void script_perform_creature(struct scrpt *script, struct ctr *creature);
 enum script_status script_perform_line_creature(struct scrpt *script, struct ctr *creature, struct script_line *line);
 enum script_status script_perform_line_entity(struct scrpt *script, struct ent *entity, struct script_line *line);
 
+bool script_accepts(struct scrpt *script, char *accept);
+bool script_proposes(struct scrpt *script, char *proposal);
 
 bool begins_with(char *s1, char *s2);
 char *get_operator(char *s1);

@@ -364,3 +364,17 @@ script_describe(struct scrpt *script)
 	}
 	printf("END SCRIPT\n");
 }
+
+
+
+bool
+script_accepts(struct scrpt *script, char *accept)
+{
+	return false;
+}
+
+bool
+script_proposes(struct scrpt *script, char *proposal)
+{
+	return false;
+}

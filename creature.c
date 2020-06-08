@@ -9,6 +9,7 @@
 #include "debug.h"
 #include "sound.h"
 #include "utility.h"
+#include "script.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -280,3 +281,29 @@ creature_search_items(struct ctr *creature, struct ent **dst)
 	return count;
 }
 
+bool
+creature_equip(struct ctr *creature, struct ent *item, enum equip_location location)
+{
+	if (location == EQUIP_LOCATION_WEAPON && script_proposes(item->script, PROPOSAL_ATTACK)) {
+		// Check for ATTACK proposal
+	} else if (script_accepts(item->script, ACCEPT_DEFEND)) {
+		// Check for DEFEND acceptance
+	}
+	return false;
+}
+
+void
+creature_unequip(struct ctr *creature, enum equip_location location)
+{
+	creature->equipment[location] = NULL;
+}
+
+enum equip_location
+creature_equip_location(struct ctr *creature, struct ent *item)
+{
+	for (int i = 0; i < _EQUIP_LOCATION_MAX; i++) {
+		if (creature->equipment[i] == item)
+			return i;
+	}
+	return -1;
+}

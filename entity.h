@@ -3,6 +3,7 @@
 
 #include<stdbool.h>
 
+#include "script.h"
 #include "vector.h"
 
 struct map;
@@ -25,6 +26,7 @@ struct ent {
     struct map *map;
 	enum size_type size;
 	struct mem *memory;
+	struct scrpt *script;
 	// list
 	struct ent *next;
 	struct ent *prev;

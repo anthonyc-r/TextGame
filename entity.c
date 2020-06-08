@@ -23,6 +23,7 @@ init_entity(struct ent *entity, char *name, char *desc, char icon, int weight, e
 	entity->icon = icon;
 	entity->weight = weight;
 	entity->size = size;
+	entity->script = NULL;
 	entity->next = NULL;
 	entity->prev = NULL;
 	return entity;
