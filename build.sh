@@ -1,3 +1,3 @@
 #!/bin/bash
-clang *.c  -g -lm -o main
+cc *.c  -g -lm -o main
 

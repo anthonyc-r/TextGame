@@ -50,12 +50,9 @@ load_map(char *filename)
 			}
 			if (entity >= 0) {
                 struct vector2i position = { j, i };
-				insert_entity(map, all_entities[(int) entity], position);
+                struct scrpt *script = script_init("data_devel//sword.script");
+				insert_entity(map, all_entities[(int) entity], script, position);
 			}
-				
-			//insert_entity(current_cell, all_entities[entity]);
-			//get other channels.. 
-			//printf("setting cell x: %d, y: %d with ground %d, entity %d, and creature %d\n", i, j, ground, entity, creature);
 		}
 	}
 	map->creatures = realloc(map->creatures, (map->creature_count + 1) * sizeof(struct ctr));

@@ -284,12 +284,9 @@ creature_search_items(struct ctr *creature, struct ent **dst)
 bool
 creature_equip(struct ctr *creature, struct ent *item, enum equip_location location)
 {
-	if (location == EQUIP_LOCATION_WEAPON && script_proposes(item->script, PROPOSAL_ATTACK)) {
-		// Check for ATTACK proposal
-	} else if (script_accepts(item->script, ACCEPT_DEFEND)) {
-		// Check for DEFEND acceptance
-	}
-	return false;
+	// No checks against non-weapon equip.
+	return (location == EQUIP_LOCATION_WEAPON && script_get_action(item->script, ACTION_ATTACK))
+			|| location != EQUIP_LOCATION_WEAPON;
 }
 
 void

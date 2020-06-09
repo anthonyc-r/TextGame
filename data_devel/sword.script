@@ -1,0 +1,12 @@
+-action attack
+#nop
+
+-reaction smash
+set_state broken
+
+-state main
+#apply_aura?
+#nop
+
+-state broken
+#nop

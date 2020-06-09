@@ -17,6 +17,8 @@
 #include <string.h>
 
 #define STATE_IDENTIFIER "-state"
+#define ACTION_IDENTIFIER "-action"
+#define REACTION_IDENTIFIER "-reaction"
 #define MEMORY_SIZE 100
 #define OPERATOR_MAX_LENGTH 100
 #define OPERAND_MAX_LENGTH 100
@@ -29,6 +31,8 @@ script_init(char *fname)
 	fpos_t fstart;
 	int numlines = 0;
 	int numstates = 0;
+	int numacts = 0;
+	int numreacts = 0;
 	char *line;
 	
 	script->memory = new_memory();
@@ -38,6 +42,10 @@ script_init(char *fname)
 	for (numlines = 0; (line = read_line(fp)); numlines++) {
 		if (strncmp(get_operator(line), STATE_IDENTIFIER, strlen(STATE_IDENTIFIER)) == 0)
 			numstates++;
+		else if (strncmp(get_operator(line), ACTION_IDENTIFIER, strlen(ACTION_IDENTIFIER)) == 0)
+			numacts++;
+		else if (strncmp(get_operator(line), REACTION_IDENTIFIER, strlen(REACTION_IDENTIFIER)) == 0)
+			numreacts++;
 		DEBUG_PRINT(("Read line %d\n", numlines));
 	}
 	DEBUG_PRINT(("Read script, found %d lines, and %d states.\n", numlines, numstates));
@@ -47,8 +55,15 @@ script_init(char *fname)
 	DEBUG_PRINT(("malloc line storage\n"));
 	script->state_locations = malloc(numstates * sizeof(struct scrpt_state_location));
 	DEBUG_PRINT(("malloc location storage\n"));
+	script->act_count = numacts;
+	script->actions = malloc(numacts * sizeof(struct action));
+	script->react_count = numreacts;
+	script->reactions = malloc(numreacts * sizeof(struct reaction));
+	DEBUG_PRINT(("malloc prop storage\n"));
 	fsetpos(fp, &fstart);
 	numstates = 0;
+	numacts = 0;
+	numreacts = 0;
 	DEBUG_PRINT(("Copying script to memory...\n"));
 	for (int i = 0; (line = read_line(fp)); i++) {
 		script->lines[i] = script_extract_line(line);
@@ -60,6 +75,22 @@ script_init(char *fname)
 			script->state_locations[numstates] = loc;
 			DEBUG_PRINT(("Stored state location %d\n", numstates));
 			numstates++;
+		} else if (strncmp(script->lines[i].op, ACTION_IDENTIFIER, strlen(ACTION_IDENTIFIER)) == 0) {
+			struct action act;
+			act.line_number = i;
+			act.identifier = script->lines[i].argv[0];
+			act.key = NULL;
+			script->actions[numacts] = act;
+			DEBUG_PRINT(("Stored prop location %d\n", numacts));
+			numacts++;
+		} else if (strncmp(script->lines[i].op, REACTION_IDENTIFIER, strlen(REACTION_IDENTIFIER)) == 0) {
+			struct reaction react;
+			react.line_number = i;
+			react.identifier = script->lines[i].argv[0];
+			react.key = NULL;
+			script->reactions[numreacts] = react;
+			DEBUG_PRINT(("Stored prop location %d\n", numreacts));
+			numreacts++;
 		}
 	}
 	fclose(fp);
@@ -367,14 +398,41 @@ script_describe(struct scrpt *script)
 
 
 
-bool
-script_accepts(struct scrpt *script, char *accept)
+struct reaction *
+script_get_reaction(struct scrpt *script, char *identifier, char *key)
 {
-	return false;
+	return NULL;
+}
+
+struct action *
+script_get_action(struct scrpt *script, char *identifier)
+{
+	for (int i = 0; i < script->act_count; i++) {
+		struct action *act = &script->actions[i];
+		if (strcmp(act->identifier, identifier) == 0)
+			return act;
+	}
+	return NULL;
 }
 
 bool
-script_proposes(struct scrpt *script, char *proposal)
+script_entity_act_on_creature(struct ent *entity, struct ctr *creature, char *action)
 {
-	return false;
+	if (entity->script == NULL || creature->script == NULL)
+		return false;
+	struct action *act = script_get_action(entity->script, action);
+	if (act == NULL)
+		return false;
+	struct reaction *react = script_get_reaction(creature->script, act->identifier, act->key);
+	if (react == NULL)
+		return false;
+
+	struct mem *tmem = new_memory();
+	memory_set_creature(tmem, creature);
+	memory_push_copy(&creature->memory, entity->script->memory);
+	free(entity->script->memory);
+	entity->script->memory = tmem;
+	// Hook into script_perform somehow...
 }
+
+

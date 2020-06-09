@@ -146,7 +146,7 @@ clear_sounds(struct map *map)
 }
 
 void 
-insert_entity(struct map *map, struct ent entity, struct vector2i position)
+insert_entity(struct map *map, struct ent entity, struct scrpt *script, struct vector2i position)
 {
     struct cell *cel = get_cell(map, &position);
 	struct ent *entity_copy = init_entity(malloc(sizeof (struct ent)), entity.name, entity.desc, entity.icon, entity.weight, entity.size);
@@ -158,6 +158,8 @@ insert_entity(struct map *map, struct ent entity, struct vector2i position)
 	if (cel->inventory) {
 		cel->inventory->prev = entity_copy;
 	}
+	entity_copy->script = script;
+	entity_copy->memory = new_memory();
 	cel->inventory = entity_copy;
 	cel->inventory_size += 1;
 }

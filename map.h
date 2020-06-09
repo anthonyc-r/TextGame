@@ -46,7 +46,7 @@ struct cell {
 struct map *init_map(int width, int height);
 void destroy_map(struct map *map);
 void render_map(struct map *map, struct wnw *window, struct vector2i *from, struct vector2i *to);
-void insert_entity(struct map *map, struct ent entity, struct vector2i position);
+void insert_entity(struct map *map, struct ent entity, struct scrpt *script, struct vector2i position);
 void map_remove_entity(struct ent *entity);
 void insert_sound(struct map *map, struct sound *sound);
 void clear_sounds(struct map *map);
