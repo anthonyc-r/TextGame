@@ -432,7 +432,14 @@ script_entity_act_on_creature(struct ent *entity, struct ctr *creature, char *ac
 	memory_push_copy(&creature->memory, entity->script->memory);
 	free(entity->script->memory);
 	entity->script->memory = tmem;
-	// Hook into script_perform somehow...
+	// Jump to location of action and run
+	// Action
+	entity->script->current_line = act->line_number;
+	script_perform_entity(entity->script, entity);
+	// Reaction
+	creature->script->current_line = react->line_number;
+	script_perform_creature(creature->script, creature);
+	return true;
 }
 
 

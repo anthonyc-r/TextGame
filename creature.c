@@ -304,3 +304,13 @@ creature_equip_location(struct ctr *creature, struct ent *item)
 	}
 	return -1;
 }
+
+bool
+creature_attack(struct ctr *creature, struct ctr *target)
+{
+	if (creature->equipment[EQUIP_LOCATION_WEAPON] == NULL) {
+		return false;
+	}
+	return script_entity_act_on_creature(creature->equipment[EQUIP_LOCATION_WEAPON], target, ACTION_ATTACK);
+}
+

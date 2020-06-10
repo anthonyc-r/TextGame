@@ -24,6 +24,7 @@ struct scrpt_state_location {
 	char *identifier;
 };
 
+// TODO: - Global actions
 struct action {
 	int line_number;
 	char *identifier;

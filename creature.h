@@ -56,5 +56,6 @@ int creature_search_items(struct ctr *creature, struct ent **dst);
 bool creature_equip(struct ctr *creature, struct ent *item, enum equip_location location);
 void creature_unequip(struct ctr *creature, enum equip_location location);
 enum equip_location creature_equip_location(struct ctr *creature, struct ent *item);
+bool creature_attack(struct ctr *creature, struct ctr *target);
 
 #endif
