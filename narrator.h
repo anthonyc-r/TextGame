@@ -21,9 +21,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MAX_NARRATOR_LINE 100
 
+struct narrator_ll {
+	char *line;
+	struct narrator_ll *next;
+};
+
 struct narrator {
-	char narrator_line[MAX_NARRATOR_LINE];
-	char **all_lines;
+	char current_line[MAX_NARRATOR_LINE];
+	struct narrator_ll *list_head;
+	struct narrator_ll *list_tail;
 } main_narrator;
 
 void narrate(struct narrator *narrator, char *string);
