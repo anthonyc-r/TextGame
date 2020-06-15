@@ -38,6 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "memory.h"
 #include "textui.h"
 #include "entity.h"
+#include "narrator.h"
 
 #define CH_ESCAPE '\x1b'
 
@@ -60,7 +61,7 @@ init_data(void)
     struct vector2i plr_position;
     plr_position.x = 10;
     plr_position.y = 10;
-	struct ctr plr = new_creature("Zoltan", "Powerful mage", 100, 100, 2);
+	struct ctr plr = new_creature("Zoltan", "Powerful mage", 100, 100, 0);
 	plr.hearing = 5;
 	player = insert_creature(active_map, &plr, NULL, plr_position);
 	DEBUG_PRINT(("done inserting test objects\n"));
@@ -86,7 +87,7 @@ init_data(void)
 	pickup_window = new_window(20, 4, 20, 12);
 	clear_window(pickup_window, '+');
 	
-	tui_info = (struct tui_info) { TUI_MODE_WALK, "", 0, 0, 0 };
+	tui_info = (struct tui_info) { TUI_MODE_WALK, "", 0, 0, 0 , 0, 0};
 	printf("game data init\n");
 }
 
@@ -113,19 +114,21 @@ render_chat(struct wnw *window)
     char *message = NULL;
     for (int i = 0; (sound = soundlist[i]); i++) {
         DEBUG_PRINT(("Found sounds!!\n"));
-		if (sound->source.creature == player)
-			continue;
-        message = sound->type->text;
+        strcpy(tui_info.logbuf[tui_info.logbuf_idx], sound->type->text);
+    	tui_info.logbuf_idx = (tui_info.logbuf_idx + 1) % TUI_MAX_LINES;
+    }
+    while ((message = next_narration(&main_narrator)) != NULL) {
+    	strcpy(tui_info.logbuf[tui_info.logbuf_idx], message);
+    	tui_info.logbuf_idx = (tui_info.logbuf_idx + 1) % TUI_MAX_LINES;
     }
     clear_window(window, ' ');
     window_fill_border(window, '-');
-	if (tui_info.status[0] != '\0') {
-		window_put_text(window, tui_info.status, WINDOW_STYLE_BORDERED_CENTER);
-		tui_info.status[0] = '\0';
-	} else if (message) {
-		window_put_text(window, message, WINDOW_STYLE_BORDERED);
-    } else {
-		window_put_text(window, "no sounds", WINDOW_STYLE_BORDERED);
+	for (int i = 1; i < window->height; i++) {
+		int idx = (tui_info.logbuf_idx - window->height) + i + 1;
+		if (idx < 0)
+			idx = TUI_MAX_LINES + idx;
+
+		window_put_line(window, tui_info.logbuf[idx], i, WINDOW_STYLE_NONE);
 	}
 }
 
@@ -298,7 +301,7 @@ perform_action_pickup(char c)
 		if (creature_take_entity(player, item)) {
 			map_remove_entity(item);
 		} else {
-			memcpy(tui_info.status, "inventory full!", 16);
+			narrate(&main_narrator, "inventory full!");
 		}
 		tui_info.mode = TUI_MODE_WALK;
 	}

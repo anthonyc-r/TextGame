@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "entity.h"
 
 #define TUI_MAX_WINDOWS 100
+#define TUI_MAX_LINES 100
+#define TUI_LINE_LENGTH 100
 
 enum tui_mode {
 	TUI_MODE_WALK,
@@ -37,7 +39,8 @@ struct tui_info {
 	struct ent *piclist;
 	int picount;
 	
-	char status[100];
+	char logbuf[TUI_MAX_LINES][TUI_LINE_LENGTH];
+	int logbuf_idx;
 } tui_info;
 
 #endif
