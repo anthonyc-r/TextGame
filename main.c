@@ -61,7 +61,7 @@ init_data(void)
     struct vector2i plr_position;
     plr_position.x = 10;
     plr_position.y = 10;
-	struct ctr plr = new_creature("Zoltan", "Powerful mage", 100, 100, 0);
+	struct ctr plr = new_creature("Zoltan", "Powerful mage", 100, 100, 2);
 	plr.hearing = 5;
 	player = insert_creature(active_map, &plr, NULL, plr_position);
 	DEBUG_PRINT(("done inserting test objects\n"));
@@ -86,6 +86,9 @@ init_data(void)
 	
 	pickup_window = new_window(20, 4, 20, 12);
 	clear_window(pickup_window, '+');
+	
+	alert_window = new_window(5, 7, 30, 3);
+	clear_window(alert_window, ' ');
 	
 	tui_info = (struct tui_info) { TUI_MODE_WALK, "", 0, 0, 0 , 0, 0};
 	printf("game data init\n");
@@ -164,8 +167,20 @@ render_inv(struct wnw *window)
 	window_fill_border(window, '-');
 	memcpy(window->data + 3, "inventory", 9);
 	for (int i = 0; i < player->inventory_size; i++) {
-		char *name = player->inventory[i]->name;
-		window_put_line(window, name, i + 1, WINDOW_STYLE_BORDERED);
+		struct ent *item = player->inventory[i];
+		if (tui_info.mode == TUI_MODE_EQUIP) {
+			char *name = item->name;
+			char labeled[strlen(name) + 3];
+			sprintf(labeled, "%c) %s", 'a' + (char)i, name);
+			window_put_line(window, labeled, i + 1, WINDOW_STYLE_BORDERED);
+		} else if ((int)creature_equip_location(player, item) > -1) {
+			char *name = item->name;
+			char labaled[strlen(name) + 1];
+			sprintf(labaled, "*%s", name);
+			window_put_line(window, labaled, i + 1, WINDOW_STYLE_BORDERED);
+		} else {
+			window_put_line(window, item->name, i + 1, WINDOW_STYLE_BORDERED);
+		}
 	}
 }
 
@@ -196,6 +211,9 @@ draw(struct map *map)
 	if (tui_info.mode == TUI_MODE_PICKUP) {
 		render_pickup(pickup_window);
 		draw_to_main(pickup_window);
+	}
+	if (tui_info.mode == TUI_MODE_EQUIP) {
+		draw_to_main(alert_window);
 	}
 	
 	for (int i = 0; i < windows.num; ++i) {
@@ -246,6 +264,10 @@ perform_action_walk(char c)
 			break;
 		case 't':
 			tui_info.mode = TUI_MODE_TALK;
+			break;
+		case 'e':
+			window_put_line(alert_window, "Equip what?", 1, WINDOW_STYLE_BORDERED_CENTER);
+			tui_info.mode = TUI_MODE_EQUIP;
 			break;
 		case 'p':
 			tui_info.mode = TUI_MODE_PICKUP;
@@ -308,6 +330,27 @@ perform_action_pickup(char c)
 }
 
 void
+perform_action_equip(char c)
+{
+	if (c == CH_ESCAPE) {
+		tui_info.mode = TUI_MODE_WALK;
+	} else {
+		int idx = c - 'a';
+		clear_window(alert_window, ' ');
+		if (idx < 0 || c > 'z' || idx >= player->inventory_size) {
+			window_put_line(alert_window, "Invalid selection!", 1, WINDOW_STYLE_BORDERED_CENTER);
+		} else {
+			struct ent *item = player->inventory[idx];
+			if (creature_equip(player, item, EQUIP_LOCATION_WEAPON)) {
+				tui_info.mode = TUI_MODE_WALK;
+			} else {
+				window_put_line(alert_window, "You can't equip that!", 1, WINDOW_STYLE_BORDERED_CENTER);
+			}
+		}
+	}
+}
+
+void
 perform_action(char c)
 {
 	switch (tui_info.mode) {
@@ -319,6 +362,9 @@ perform_action(char c)
 			break;
 		case TUI_MODE_PICKUP:
 			perform_action_pickup(c);
+			break;
+		case TUI_MODE_EQUIP:
+			perform_action_equip(c);
 			break;
 	}	
 }

@@ -302,8 +302,12 @@ bool
 creature_equip(struct ctr *creature, struct ent *item, enum equip_location location)
 {
 	// No checks against non-weapon equip.
-	return (location == EQUIP_LOCATION_WEAPON && script_get_action(item->script, ACTION_ATTACK))
-			|| location != EQUIP_LOCATION_WEAPON;
+	if (location == EQUIP_LOCATION_WEAPON && script_get_action(item->script, ACTION_ATTACK)) {
+		creature->equipment[location] = item;
+		return true;
+	} else {
+		return location != EQUIP_LOCATION_WEAPON;
+	}
 }
 
 void

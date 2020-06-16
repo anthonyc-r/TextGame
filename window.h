@@ -39,6 +39,7 @@ struct wnw *chat_window;
 struct wnw *talk_window;
 struct wnw *pickup_window;
 struct wnw *inv_window;
+struct wnw *alert_window;
 
 struct wnw *new_window(int x, int y, int width, int height);
 void clear_window(struct wnw *window, char clear_char);

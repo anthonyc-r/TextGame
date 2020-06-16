@@ -28,7 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 enum tui_mode {
 	TUI_MODE_WALK,
 	TUI_MODE_TALK,
-	TUI_MODE_PICKUP
+	TUI_MODE_PICKUP,
+	TUI_MODE_EQUIP
 };
 
 struct tui_info {
