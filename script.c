@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "entity.h"
 #include "sound.h"
 #include "rouge.h"
+#include "narrator.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -229,6 +230,12 @@ script_parse_line(struct scrpt *script, struct mem **stack, struct script_line *
 	} else if (strcmp(op, "repeat") == 0) {
 		DEBUG_PRINT(("repeat invoked\n"));
 		script_reset(script);
+		return TURN_CONTINUE;
+	} else if (strcmp(op, "narrate") == 0) {
+		DEBUG_PRINT(("narrate invoked\n"));
+		if (arg != NULL) {
+			narrate(&main_narrator, arg);
+		}
 		return TURN_CONTINUE;
 	} else {
 		return NO_MATCH;

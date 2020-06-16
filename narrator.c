@@ -23,9 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 void
 narrate(struct narrator *narrator, char *string)
 {
-	int len = MIN(strlen(string), MAX_NARRATOR_LINE);
+	int len = strlen(string);
 	char *copy = malloc(len);
-	strncpy(copy, string, MAX_NARRATOR_LINE);
+	strcpy(copy, string);
 	copy[len - 1] = '\0';
 	struct narrator_ll *ll = malloc(sizeof(struct narrator_ll));
 	ll->line = copy;
