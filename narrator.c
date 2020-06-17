@@ -24,9 +24,9 @@ void
 narrate(struct narrator *narrator, char *string)
 {
 	int len = strlen(string);
-	char *copy = malloc(len);
+	char *copy = malloc(len + 1);
 	strcpy(copy, string);
-	copy[len - 1] = '\0';
+	copy[len] = '\0';
 	struct narrator_ll *ll = malloc(sizeof(struct narrator_ll));
 	ll->line = copy;
 	ll->next = NULL;

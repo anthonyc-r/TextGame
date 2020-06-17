@@ -425,6 +425,11 @@ script_describe(struct scrpt *script)
 struct reaction *
 script_get_reaction(struct scrpt *script, char *identifier, char *key)
 {
+	for (int i = 0; i < script->react_count; i++) {
+		struct reaction *react = &script->reactions[i];
+		if (strcmp(react->identifier, identifier) == 0)
+			return react;
+	}
 	return NULL;
 }
 
@@ -458,10 +463,10 @@ script_entity_act_on_creature(struct ent *entity, struct ctr *creature, char *ac
 	entity->script->memory = tmem;
 	// Jump to location of action and run
 	// Action
-	entity->script->current_line = act->line_number;
+	entity->script->current_line = act->line_number + 1;
 	script_perform_entity(entity->script, entity);
 	// Reaction
-	creature->script->current_line = react->line_number;
+	creature->script->current_line = react->line_number + 1;
 	script_perform_creature(creature->script, creature);
 	return true;
 }

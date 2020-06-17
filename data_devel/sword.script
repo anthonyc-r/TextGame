@@ -1,4 +1,5 @@
 -action attack
+narrate You slash at the target!
 #nop
 
 -reaction smash

@@ -1,3 +1,6 @@
+-reaction attack
+say Ouch, that hurt!!!
+
 -state main
 look_creature
 set_state_cont search_player
