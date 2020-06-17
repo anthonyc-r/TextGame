@@ -93,7 +93,11 @@ creature_walk(struct ctr *creature, enum dir_t direction)
 	//Void cells are unpassable by walking.
 	if (dest_cell->ground == 0 || dest_cell->ground == -1) 
 		blocked = true;
-
+	
+	// Can't walk through other critters
+	if (dest_cell->creature != NULL)
+		blocked = true;
+	
 	//Check for blocking items.
 	for (int i = 0; i < dest_cell->inventory_size; ++i) {
 		entity = &dest_cell->inventory[i];
