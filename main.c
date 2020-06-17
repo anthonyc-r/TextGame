@@ -152,7 +152,7 @@ render_pickup(struct wnw *window)
 	window_fill_border(window, '0');
 	memcpy(window->data + 3, "pick up", 7);
 	for (int i = 0; i < tui_info.picount; i++) {
-		char *name = tui_info.piclist[i].name;
+		char *name = tui_info.piclist[i]->name;
 		char entry[strlen(name) + 3];
 		// todo: - make work for more items...
 		sprintf(entry, "%c) %s", 'a' + i, name);
@@ -283,8 +283,8 @@ perform_action_walk(char c)
 		case 'p':
 			tui_info.mode = TUI_MODE_PICKUP;
 			tui_info.picount = creature_search_items(player, NULL);
-			tui_info.piclist = malloc(tui_info.picount * sizeof (struct ent));
-			creature_search_items(player, &tui_info.piclist);
+			tui_info.piclist = malloc(tui_info.picount * sizeof (struct ent*));
+			creature_search_items(player, tui_info.piclist);
 			break;
 		case 'm':
 			window_test();
@@ -330,7 +330,7 @@ perform_action_pickup(char c)
 		if (idx < 0 || idx >= tui_info.picount) {
 			return;
 		}
-		struct ent *item = tui_info.piclist + idx;
+		struct ent *item = tui_info.piclist[idx];
 		if (creature_take_entity(player, item)) {
 			map_remove_entity(item);
 			free(tui_info.piclist);

@@ -38,7 +38,7 @@ struct tui_info {
 	char talkbuf[100];
 	int talklen;
 	
-	struct ent *piclist;
+	struct ent **piclist;
 	int picount;
 	
 	char logbuf[TUI_MAX_LINES][TUI_LINE_LENGTH];
