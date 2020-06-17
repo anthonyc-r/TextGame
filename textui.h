@@ -29,7 +29,8 @@ enum tui_mode {
 	TUI_MODE_WALK,
 	TUI_MODE_TALK,
 	TUI_MODE_PICKUP,
-	TUI_MODE_EQUIP
+	TUI_MODE_EQUIP,
+	TUI_MODE_ATTACK
 };
 
 struct tui_info {
@@ -42,6 +43,7 @@ struct tui_info {
 	
 	char logbuf[TUI_MAX_LINES][TUI_LINE_LENGTH];
 	int logbuf_idx;
+	
 } tui_info;
 
 #endif

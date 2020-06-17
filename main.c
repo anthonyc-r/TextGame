@@ -247,20 +247,31 @@ window_test()
 }
 
 void
+player_walk(enum dir_t dir)
+{
+	if (!creature_walk(player, dir)) {
+		struct ctr *creature = creature_look_direction(player, dir);
+		if (creature) {
+		 	creature_attack(player, creature);
+		 	DEBUG_PRINT(("triggered attack!\n"));
+		}
+	}
+}
+void
 perform_action_walk(char c)
 {
 	switch (c) {
 		case 'w':
-			creature_walk(player, NORTH);
+			player_walk(NORTH);
 			break;
 		case 'a':
-			creature_walk(player, WEST);
+			player_walk(WEST);
 			break;
 		case 's':
-			creature_walk(player, SOUTH);
+			player_walk(SOUTH);
 			break;
 		case 'd':
-			creature_walk(player, EAST);
+			player_walk(EAST);
 			break;
 		case 't':
 			tui_info.mode = TUI_MODE_TALK;
@@ -322,6 +333,7 @@ perform_action_pickup(char c)
 		struct ent *item = tui_info.piclist + idx;
 		if (creature_take_entity(player, item)) {
 			map_remove_entity(item);
+			free(tui_info.piclist);
 		} else {
 			narrate(&main_narrator, "inventory full!");
 		}
@@ -349,6 +361,7 @@ perform_action_equip(char c)
 		}
 	}
 }
+
 
 void
 perform_action(char c)

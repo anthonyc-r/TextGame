@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "sound.h"
 #include "utility.h"
 #include "script.h"
+#include "narrator.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -58,7 +59,7 @@ creature_walk_toward(struct ctr *creature, struct ctr *other)
 		return false;
 }
 
-void
+bool
 creature_walk(struct ctr *creature, enum dir_t direction)
 {
 	struct vector2i dest_pnt = creature->position;
@@ -87,7 +88,7 @@ creature_walk(struct ctr *creature, enum dir_t direction)
 	dest_cell = get_cell(creature->map, &dest_pnt);
 	if (!dest_cell || !current_cell) {
 		DEBUG_PRINT(("Destination or current cell null.\n"));
-		return;
+		return false;
 	}
 	
 	//Void cells are unpassable by walking.
@@ -111,6 +112,39 @@ creature_walk(struct ctr *creature, enum dir_t direction)
 		dest_cell->creature = creature;
         creature->position = dest_pnt;
 	}
+	return !blocked;
+}
+
+struct ctr *
+creature_look_direction(struct ctr *creature, enum dir_t direction)
+{
+	struct vector2i dest_pnt = creature->position;
+	struct cell *current_cell;
+	struct cell *dest_cell;
+
+	switch (direction) {
+		case NORTH:
+			dest_pnt.y -= 1;
+			break;
+		case EAST:
+			dest_pnt.x += 1;
+			break;
+		case SOUTH:
+			dest_pnt.y += 1;
+			break;
+		case WEST:
+			dest_pnt.x -= 1;
+			break;
+		default:
+			break;
+	}
+	current_cell = get_cell(creature->map, &creature->position);
+	dest_cell = get_cell(creature->map, &dest_pnt);
+	if (!dest_cell) {
+		DEBUG_PRINT(("Destination cell null.\n"));
+		return NULL;
+	}
+	return dest_cell->creature;
 }
 
 struct ctr
@@ -334,6 +368,7 @@ bool
 creature_attack(struct ctr *creature, struct ctr *target)
 {
 	if (creature->equipment[EQUIP_LOCATION_WEAPON] == NULL) {
+		narrate(&main_narrator, "No weapon equipped!");
 		return false;
 	}
 	return script_entity_act_on_creature(creature->equipment[EQUIP_LOCATION_WEAPON], target, ACTION_ATTACK);
