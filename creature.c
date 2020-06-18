@@ -368,11 +368,9 @@ bool
 creature_attack(struct ctr *creature, struct ctr *target)
 {
 	if (creature->equipment[EQUIP_LOCATION_WEAPON] == NULL) {
-		narrate(&main_narrator, "No weapon equipped!");
 		return false;
 	}
 	if (!script_entity_act_on_creature(creature->equipment[EQUIP_LOCATION_WEAPON], target, ACTION_ATTACK)) {
-		narrate(&main_narrator, "Nothing happens.");
 		return false;
 	}
 	return true;

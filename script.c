@@ -362,6 +362,12 @@ script_perform_line_creature(struct scrpt *script, struct ctr *creature, struct 
 			memory_push(&creature->memory, memory);
 		}
 		return TURN_CONTINUE;
+	} else if (strcmp(op, "attack") == 0) {
+		struct ctr *memcreature = memory_active_creature(script->memory, creature->map);
+		if (memcreature) {
+			creature_attack(creature, memcreature);
+		}
+		return TURN_END;
 	} else {
 		return NO_MATCH;
 	}

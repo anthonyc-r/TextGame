@@ -250,10 +250,14 @@ void
 player_walk(enum dir_t dir)
 {
 	if (!creature_walk(player, dir)) {
+		// blocked
 		struct ctr *creature = creature_look_direction(player, dir);
 		if (creature) {
-		 	creature_attack(player, creature);
-		 	DEBUG_PRINT(("triggered attack!\n"));
+		 	if (creature_attack(player, creature)) {
+		 		DEBUG_PRINT(("triggered attack!\n"));
+		 	} else {
+		 		narrate(&main_narrator, "Nothing happens.");
+		 	}	
 		}
 	}
 }
