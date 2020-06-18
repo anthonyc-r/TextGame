@@ -61,7 +61,7 @@ init_data(void)
     struct vector2i plr_position;
     plr_position.x = 10;
     plr_position.y = 10;
-	struct ctr plr = new_creature("Meguca", "Powerful mage", 100, 100, 2);
+	struct ctr plr = new_creature("Zoltan", "Powerful mage", 100, 100, 2);
 	plr.hearing = 5;
 	player = insert_creature(active_map, &plr, NULL, plr_position);
 	DEBUG_PRINT(("done inserting test objects\n"));
@@ -89,6 +89,9 @@ init_data(void)
 	
 	alert_window = new_window(5, 7, 30, 3);
 	clear_window(alert_window, ' ');
+	
+	target_window = new_window(20, 4, 20, 12);
+	clear_window(target_window, ' ');
 	
 	tui_info = (struct tui_info) { TUI_MODE_WALK, "", 0, 0, 0 , 0, 0};
 	printf("game data init\n");
@@ -168,7 +171,7 @@ render_inv(struct wnw *window)
 	memcpy(window->data + 3, "inventory", 9);
 	for (int i = 0; i < player->inventory_size; i++) {
 		struct ent *item = player->inventory[i];
-		if (tui_info.mode == TUI_MODE_EQUIP) {
+		if (tui_info.mode == TUI_MODE_EQUIP || tui_info.mode == TUI_MODE_USE) {
 			char *name = item->name;
 			char labeled[strlen(name) + 3];
 			sprintf(labeled, "%c) %s", 'a' + (char)i, name);
@@ -182,6 +185,29 @@ render_inv(struct wnw *window)
 			window_put_line(window, item->name, i + 1, WINDOW_STYLE_BORDERED);
 		}
 	}
+}
+
+void
+render_target(struct wnw *window)
+{
+	clear_window(window, ' ');
+	window_fill_border(window, '0');
+	memcpy(window->data + 3, "target?", 7);
+	struct ctr **around = creature_look(player);
+	struct ctr *current;
+	int i = 0;
+	for (i = 0; (current = around[i]) != NULL; i++) {
+		char labeled[strlen(current->name) + 3];
+		sprintf(labeled, "%c) %s", 'a' + i, current->name);
+		window_put_line(window, labeled, i + 1, WINDOW_STYLE_BORDERED);	
+	}
+	int sz = i * sizeof (struct ctr*);
+	if (tui_info.ctrlist != NULL) {
+		free(tui_info.ctrlist);
+		tui_info.ctrlist = NULL;
+	}
+	tui_info.ctrcount = i;
+	tui_info.ctrlist = around;
 }
 
 void
@@ -203,17 +229,26 @@ draw(struct map *map)
 	render_inv(inv_window);
 	draw_to_main(inv_window);
 	
-	
-	if (tui_info.mode == TUI_MODE_TALK) {
-		render_talk(talk_window);
-		draw_to_main(talk_window);
-	}
-	if (tui_info.mode == TUI_MODE_PICKUP) {
-		render_pickup(pickup_window);
-		draw_to_main(pickup_window);
-	}
-	if (tui_info.mode == TUI_MODE_EQUIP) {
-		draw_to_main(alert_window);
+	switch (tui_info.mode) {
+		case TUI_MODE_TALK:
+			render_talk(talk_window);
+			draw_to_main(talk_window);
+			break;
+		case TUI_MODE_PICKUP:
+			render_pickup(pickup_window);
+			draw_to_main(pickup_window);
+			break;
+		case TUI_MODE_EQUIP:
+			draw_to_main(alert_window);
+			break;
+		case TUI_MODE_USE:
+			if (tui_info.uitem != NULL) {
+				render_target(target_window);
+				draw_to_main(target_window);
+			} else {
+				draw_to_main(alert_window);
+			}
+			break;
 	}
 	
 	for (int i = 0; i < windows.num; ++i) {
@@ -281,6 +316,7 @@ perform_action_walk(char c)
 			tui_info.mode = TUI_MODE_TALK;
 			break;
 		case 'e':
+			clear_window(alert_window, ' ');
 			window_put_line(alert_window, "Equip what?", 1, WINDOW_STYLE_BORDERED_CENTER);
 			tui_info.mode = TUI_MODE_EQUIP;
 			break;
@@ -289,6 +325,12 @@ perform_action_walk(char c)
 			tui_info.picount = creature_search_items(player, NULL);
 			tui_info.piclist = malloc(tui_info.picount * sizeof (struct ent*));
 			creature_search_items(player, tui_info.piclist);
+			break;
+		case 'u':
+			clear_window(alert_window, ' ');
+			window_put_line(alert_window, "Use what?", 1, WINDOW_STYLE_BORDERED_CENTER);
+			tui_info.mode = TUI_MODE_USE;
+			tui_info.uitem = NULL;
 			break;
 		case 'm':
 			window_test();
@@ -368,6 +410,40 @@ perform_action_equip(char c)
 
 
 void
+perform_action_use(char c)
+{
+	if (c == CH_ESCAPE) {
+		tui_info.mode = TUI_MODE_WALK;
+		if (tui_info.ctrlist != NULL) {
+			free(tui_info.ctrlist);
+			tui_info.ctrlist = NULL;
+		}
+		tui_info.ctrcount = 0;
+	} else if (tui_info.uitem == NULL) {
+		// is picking an item
+		int idx = c - 'a';
+		if (idx >= player->inventory_size || idx < 0) {
+			clear_window(alert_window, ' ');
+			window_put_line(alert_window, "Invalid selection!", 1, WINDOW_STYLE_BORDERED_CENTER);
+		} else {
+			tui_info.uitem = player->inventory[idx];
+		}
+	} else {
+		// is picking a target
+		int idx = c - 'a';
+		if (idx >= tui_info.ctrcount || idx < 0) {
+			clear_window(alert_window, ' ');
+			window_put_line(alert_window, "Invalid selection!", 1, WINDOW_STYLE_BORDERED_CENTER);
+		} else {
+			// TODO: - use item.
+			free(tui_info.ctrlist);
+			tui_info.ctrlist = NULL;
+			tui_info.mode = TUI_MODE_WALK;
+		}
+	}
+}
+
+void
 perform_action(char c)
 {
 	switch (tui_info.mode) {
@@ -382,6 +458,9 @@ perform_action(char c)
 			break;
 		case TUI_MODE_EQUIP:
 			perform_action_equip(c);
+			break;
+		case TUI_MODE_USE:
+			perform_action_use(c);
 			break;
 	}	
 }
