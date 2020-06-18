@@ -112,6 +112,7 @@ script_init(char *fname)
 		}
 	}
 	fclose(fp);
+	script_reset(script);
 	return script;
 }
 

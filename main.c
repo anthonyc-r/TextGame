@@ -61,7 +61,7 @@ init_data(void)
     struct vector2i plr_position;
     plr_position.x = 10;
     plr_position.y = 10;
-	struct ctr plr = new_creature("Zoltan", "Powerful mage", 100, 100, 2);
+	struct ctr plr = new_creature("Meguca", "Powerful mage", 100, 100, 2);
 	plr.hearing = 5;
 	player = insert_creature(active_map, &plr, NULL, plr_position);
 	DEBUG_PRINT(("done inserting test objects\n"));
