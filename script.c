@@ -456,11 +456,27 @@ script_entity_act_on_creature(struct ent *entity, struct ctr *creature, char *ac
 {
 	if (entity->script == NULL || creature->script == NULL)
 		return false;
-	struct action *act = script_get_action(entity->script, action);
-	if (act == NULL)
-		return false;
-	struct reaction *react = script_get_reaction(creature->script, act->identifier, act->key);
-	if (react == NULL)
+	struct action *act;
+	struct reaction *react;
+	
+	if (action != NULL) {
+		act = script_get_action(entity->script, action);
+		react = script_get_reaction(creature->script, act->identifier, act->key);
+	} else {
+		// find the first matching action/reaction combo
+		char *id1, *id2;
+		for (int i = 0; i < entity->script->act_count; i++) {
+			for (int j = 0; j < creature->script->react_count; j++) {
+				id1 = entity->script->actions[i].identifier;
+				id2 = creature->script->reactions[j].identifier;
+				if (strcmp(id1, id2) == 0) {
+					act = &entity->script->actions[i];
+					react = &creature->script->reactions[j];
+				}
+			}
+		}
+	}
+	if (act == NULL || react == NULL)
 		return false;
 
 	struct mem *tmem = new_memory();

@@ -71,3 +71,7 @@ entity_size(char *string)
 		return SIZE_TINY;
 	}
 }
+
+bool entity_use_creature(struct ent *entity, struct ctr *creature) {
+	script_entity_act_on_creature(entity, creature, NULL);
+}

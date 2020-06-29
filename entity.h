@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 struct map;
 struct mem;
+struct ctr;
 
 enum size_type {
 	SIZE_TINY,
@@ -53,4 +54,5 @@ struct ent* init_entity(struct ent *entity, char *name, char *desc, char icon, i
 struct ent new_entity(char *name, char *desc, char icon, int weight, enum size_type size);
 int entity_blocking(struct ent *entity);
 enum size_type entity_size(char *string);
+bool entity_use_creature(struct ent *entity, struct ctr *creature);
 #endif

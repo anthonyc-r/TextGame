@@ -435,7 +435,7 @@ perform_action_use(char c)
 			clear_window(alert_window, ' ');
 			window_put_line(alert_window, "Invalid selection!", 1, WINDOW_STYLE_BORDERED_CENTER);
 		} else {
-			// TODO: - use item.
+			entity_use_creature(tui_info.uitem, tui_info.ctrlist[idx]);
 			free(tui_info.ctrlist);
 			tui_info.ctrlist = NULL;
 			tui_info.mode = TUI_MODE_WALK;
