@@ -1,4 +1,5 @@
 obj/
+game_editor/main
 main
 .kateproject
 valgrind-out.txt
