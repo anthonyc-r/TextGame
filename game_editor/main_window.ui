@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<interface>
+	<!-- gtk+3.8 -->
+	<template class="GameEditorMainWindow" parent="GtkApplicationWindow">
+		<property name="title">Game Editor</property>
+		<property name="default-width">800</property>
+		<property name="default-height">600</property>
+		<child>
+			<object class="GtkBox">
+				<property name="visible">True</property>
+				<property name="orientation">horizontal</property>
+				<child>
+					<object class="GtkBox">
+						<property name="visible">True</property>
+						<property name="orientation">vertical</property>
+						<child>
+							<object class="GtkComboBox" id="resource_combo_box">
+								<property name="visible">True</property>
+							</object>
+						</child>
+						<child>
+							<object class="GtkStack">
+								<property name="visible">True</property>
+							</object>
+						</child>
+					</object>
+				</child>
+				<child>
+					<object class="GtkButton">
+						<property name="visible">True</property>
+						<property name="label">Clikku Me</property>
+					</object>
+				</child>
+			</object>		
+		</child>
+	</template>
+</interface>

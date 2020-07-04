@@ -32,11 +32,13 @@ G_DEFINE_TYPE(GameEditorApp, game_editor_app, GTK_TYPE_APPLICATION);
 static void
 game_editor_app_activate(GApplication *app)
 {
-	GameEditorMainWindow *win;
+	GameEditorMainWindow *window;
 
 	g_debug("app activated");	
-	win = game_editor_main_window_new(GAME_EDITOR_APP(app));
-	gtk_window_present(GTK_WINDOW(win));
+	window = game_editor_main_window_new(GAME_EDITOR_APP(app));
+
+	
+	gtk_window_present(GTK_WINDOW(window));
 }
 
 static void

@@ -30,12 +30,14 @@ G_DEFINE_TYPE(GameEditorMainWindow, game_editor_main_window, GTK_TYPE_APPLICATIO
 static void
 game_editor_main_window_init(GameEditorMainWindow *window)
 {
-	gtk_window_set_default_size(GTK_WINDOW(window), 800, 600);
+	gtk_widget_init_template(GTK_WIDGET(window));
 }
 
 static void
 game_editor_main_window_class_init(GameEditorMainWindowClass *class)
 {
+	gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),  "/rocks/colourful/textgame/main_window.ui");
+	
 }
 
 GameEditorMainWindow *
