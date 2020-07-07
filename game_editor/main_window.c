@@ -19,34 +19,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "app.h"
 #include "main_window.h"
+#include "headerbar.h"
 
-struct _GameEditorMainWindow
+struct _EditorMainWindow
 {
 	GtkApplicationWindow parent;
 };
 
-G_DEFINE_TYPE(GameEditorMainWindow, game_editor_main_window, GTK_TYPE_APPLICATION_WINDOW);
+G_DEFINE_TYPE(EditorMainWindow, editor_main_window, GTK_TYPE_APPLICATION_WINDOW);
 
 static void
-game_editor_main_window_init(GameEditorMainWindow *window)
+editor_main_window_init(EditorMainWindow *window)
 {
 	gtk_widget_init_template(GTK_WIDGET(window));
+	gtk_window_set_titlebar(GTK_WINDOW(window), editor_headerbar_new());
 }
 
 static void
-game_editor_main_window_class_init(GameEditorMainWindowClass *class)
+editor_main_window_class_init(EditorMainWindowClass *class)
 {
 	gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),  "/rocks/colourful/textgame/main_window.ui");
 	
 }
 
-GameEditorMainWindow *
-game_editor_main_window_new(GameEditorApp *app)
+EditorMainWindow *
+editor_main_window_new(EditorApp *app)
 {
-	return g_object_new(GAME_EDITOR_MAIN_WINDOW_TYPE, "application", app, "title", "Game Editor", NULL);
+	return g_object_new(EDITOR_MAIN_WINDOW_TYPE, "application", app, "title", "Game Editor", NULL);
 }
 
-void
-game_editor_main_window_open(GameEditorMainWindow *win, GFile *file)
-{
-}

@@ -3,4 +3,10 @@
 	<gresource prefix="/rocks/colourful/textgame">
 		<file preprocess="xml-stripblanks">main_window.ui</file>
 	</gresource>
+	<gresource prefix="/rocks/colourful/textgame">
+		<file preprocess="xml-stripblanks">headerbar.ui</file>
+	</gresource>
+	<gresource prefix="/rocks/colourful/textgame">
+		<file preprocess="xml-stripblanks">menu.ui</file>
+	</gresource>
 </gresources>

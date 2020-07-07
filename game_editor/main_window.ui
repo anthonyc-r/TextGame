@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!--
+Copyright 2020 Anthony Cohn-Richardby
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
 <interface>
 	<!-- gtk+3.8 -->
-	<template class="GameEditorMainWindow" parent="GtkApplicationWindow">
+	<template class="EditorMainWindow" parent="GtkApplicationWindow">
 		<property name="title">Game Editor</property>
 		<property name="default-width">800</property>
 		<property name="default-height">600</property>
@@ -13,22 +30,45 @@
 					<object class="GtkBox">
 						<property name="visible">True</property>
 						<property name="orientation">vertical</property>
+						<property name="width-request">200</property>
+						<child>
+							<object class="GtkLabel">
+								<property name="visible">True</property>
+								<property name="label">Resources</property>
+							</object>
+						</child>
 						<child>
 							<object class="GtkComboBox" id="resource_combo_box">
 								<property name="visible">True</property>
 							</object>
 						</child>
 						<child>
-							<object class="GtkStack">
+							<object class="GtkStack" id="resource_stack">
 								<property name="visible">True</property>
 							</object>
 						</child>
 					</object>
 				</child>
 				<child>
-					<object class="GtkButton">
+					<object class="GtkGrid" id="map_grid">
 						<property name="visible">True</property>
-						<property name="label">Clikku Me</property>
+					</object>
+					<packing>
+						<property name="fill">True</property>
+						<property name="expand">True</property>
+					</packing>
+				</child>
+				<child>
+					<object class="GtkBox">
+						<property name="visible">True</property>
+						<property name="orientation">vertical</property>
+						<property name="width-request">200</property>
+							<child>
+								<object class="GtkLabel">
+									<property name="visible">True</property>
+									<property name="label">Selected Cell</property>
+								</object>
+							</child>
 					</object>
 				</child>
 			</object>		

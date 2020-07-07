@@ -20,10 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <gtk/gtk.h>
 
-#define GAME_EDITOR_MAIN_WINDOW_TYPE (game_editor_main_window_get_type ())
-G_DECLARE_FINAL_TYPE(GameEditorMainWindow, game_editor_main_window, GAME_EDITOR, MAIN_WINDOW, GtkApplicationWindow);
+#define EDITOR_MAIN_WINDOW_TYPE (editor_main_window_get_type ())
+G_DECLARE_FINAL_TYPE(EditorMainWindow, editor_main_window, EDITOR, MAIN_WINDOW, GtkApplicationWindow);
 
-GameEditorMainWindow *game_editor_main_window_new(GameEditorApp *app);
-void game_editor_main_window_open(GameEditorMainWindow *win, GFile *file);
+EditorMainWindow *editor_main_window_new(EditorApp *app);
 
 #endif

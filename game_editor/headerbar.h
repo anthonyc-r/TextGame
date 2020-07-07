@@ -15,12 +15,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef _HEADERBAR_H
+#define _HEADERBAR_H
+
 #include <gtk/gtk.h>
 
-#include "app.h"
+#define EDITOR_HEADERBAR_TYPE (editor_headerbar_get_type ())
+G_DECLARE_FINAL_TYPE(EditorHeaderbar, editor_headerbar, EDITOR, HEADERBAR, GtkApplicationWindow);
 
-int
-main(int argc, char **argv) 
-{
-	return g_application_run(G_APPLICATION(editor_app_new()), argc, argv);
-}
+EditorHeaderbar *editor_headerbar_new();
+
+#endif

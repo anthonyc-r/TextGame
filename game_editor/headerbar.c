@@ -18,9 +18,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <gtk/gtk.h>
 
 #include "app.h"
+#include "headerbar.h"
 
-int
-main(int argc, char **argv) 
+struct _EditorHeaderbar
 {
-	return g_application_run(G_APPLICATION(editor_app_new()), argc, argv);
+	GtkHeaderBar parent;
+};
+
+G_DEFINE_TYPE(EditorHeaderbar, editor_headerbar, GTK_TYPE_HEADER_BAR);
+
+static void
+editor_headerbar_init(EditorHeaderbar *window)
+{
+	gtk_widget_init_template(GTK_WIDGET(window));
+}
+
+static void
+editor_headerbar_class_init(EditorHeaderbarClass *class)
+{
+	gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),  "/rocks/colourful/textgame/headerbar.ui");
+	
+}
+
+EditorHeaderbar *
+editor_headerbar_new()
+{
+	return g_object_new(EDITOR_HEADERBAR_TYPE, NULL);
 }

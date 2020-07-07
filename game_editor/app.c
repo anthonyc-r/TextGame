@@ -20,39 +20,53 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "app.h"
 #include "main_window.h"
 
-struct _GameEditorApp
+struct _EditorApp
 {
 	GtkApplication parent;
 };
 
 
-G_DEFINE_TYPE(GameEditorApp, game_editor_app, GTK_TYPE_APPLICATION);
+G_DEFINE_TYPE(EditorApp, editor_app, GTK_TYPE_APPLICATION);
 
 
 static void
-game_editor_app_activate(GApplication *app)
+editor_app_activate(GApplication *app)
 {
-	GameEditorMainWindow *window;
+	EditorMainWindow *window;
 
 	g_debug("app activated");	
-	window = game_editor_main_window_new(GAME_EDITOR_APP(app));
+	window = editor_main_window_new(EDITOR_APP(app));
 
 	
 	gtk_window_present(GTK_WINDOW(window));
 }
 
+
 static void
-game_editor_app_init(GameEditorApp *app)
+editor_app_startup(GApplication *app)
+{
+	G_APPLICATION_CLASS(editor_app_parent_class)->startup(app);
+
+	GtkBuilder *builder = gtk_builder_new_from_resource("/rocks/colourful/textgame/menu.ui");
+	GMenuModel *menu = G_MENU_MODEL(gtk_builder_get_object(builder, "menu"));
+	gtk_application_set_app_menu(GTK_APPLICATION(app), menu);
+	g_object_unref(builder);
+}
+
+static void
+editor_app_init(EditorApp *app)
 {
 }
 
 static void
-game_editor_app_class_init(GameEditorAppClass *class)
+editor_app_class_init(EditorAppClass *class)
 {
-	G_APPLICATION_CLASS(class)->activate = game_editor_app_activate;
+	G_APPLICATION_CLASS(class)->activate = editor_app_activate;
+	G_APPLICATION_CLASS(class)->startup = editor_app_startup;
 }
 
-GameEditorApp *game_editor_app_new()
+EditorApp *
+editor_app_new()
 {
-	return g_object_new(GAME_EDITOR_APP_TYPE, NULL);
+	return g_object_new(EDITOR_APP_TYPE, NULL);
 }

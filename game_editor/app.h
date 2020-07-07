@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <gtk/gtk.h>
 
-#define GAME_EDITOR_APP_TYPE (game_editor_app_get_type ())
-G_DECLARE_FINAL_TYPE(GameEditorApp, game_editor_app, GAME_EDITOR, APP,  GtkApplication)
+#define EDITOR_APP_TYPE (editor_app_get_type ())
+G_DECLARE_FINAL_TYPE(EditorApp, editor_app, EDITOR, APP,  GtkApplication)
 
-GameEditorApp *game_editor_app_new();
+EditorApp *editor_app_new();
 
 #endif
 
