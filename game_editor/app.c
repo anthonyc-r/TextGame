@@ -41,16 +41,23 @@ editor_app_activate(GApplication *app)
 	gtk_window_present(GTK_WINDOW(window));
 }
 
+static void
+quit_activated(GSimpleAction *action, GVariant *param, gpointer app)
+{
+	g_application_quit(G_APPLICATION(app));
+}
+
+
+static GActionEntry editor_app_entries[] = 
+{
+	{"quit", quit_activated, NULL, NULL, NULL }
+};
 
 static void
 editor_app_startup(GApplication *app)
 {
 	G_APPLICATION_CLASS(editor_app_parent_class)->startup(app);
-
-	GtkBuilder *builder = gtk_builder_new_from_resource("/rocks/colourful/textgame/menu.ui");
-	GMenuModel *menu = G_MENU_MODEL(gtk_builder_get_object(builder, "menu"));
-	gtk_application_set_app_menu(GTK_APPLICATION(app), menu);
-	g_object_unref(builder);
+	g_action_map_add_action_entries(G_ACTION_MAP(app), editor_app_entries, G_N_ELEMENTS(editor_app_entries), app);
 }
 
 static void

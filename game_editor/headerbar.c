@@ -23,20 +23,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 struct _EditorHeaderbar
 {
 	GtkHeaderBar parent;
+	GtkMenuButton *menu_button;
 };
 
 G_DEFINE_TYPE(EditorHeaderbar, editor_headerbar, GTK_TYPE_HEADER_BAR);
 
 static void
-editor_headerbar_init(EditorHeaderbar *window)
+editor_headerbar_init(EditorHeaderbar *headerbar)
 {
-	gtk_widget_init_template(GTK_WIDGET(window));
+	gtk_widget_init_template(GTK_WIDGET(headerbar));
+	GtkBuilder *builder = gtk_builder_new_from_resource("/rocks/colourful/textgame/menu.ui");
+	GMenuModel *app_menu = G_MENU_MODEL(gtk_builder_get_object(builder, "menu"));
+	GtkMenuButton *menu_button = headerbar->menu_button;
+	gtk_menu_button_set_menu_model(GTK_MENU_BUTTON(menu_button), app_menu);
 }
 
 static void
 editor_headerbar_class_init(EditorHeaderbarClass *class)
 {
 	gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),  "/rocks/colourful/textgame/headerbar.ui");
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorHeaderbar, menu_button);
 	
 }
 

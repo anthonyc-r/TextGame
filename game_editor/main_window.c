@@ -32,7 +32,7 @@ static void
 editor_main_window_init(EditorMainWindow *window)
 {
 	gtk_widget_init_template(GTK_WIDGET(window));
-	gtk_window_set_titlebar(GTK_WINDOW(window), editor_headerbar_new());
+	gtk_window_set_titlebar(GTK_WINDOW(window), GTK_WIDGET(editor_headerbar_new()));
 }
 
 static void
