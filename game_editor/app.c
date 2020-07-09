@@ -19,10 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "app.h"
 #include "main_window.h"
+#include "game_data.h"
 
 struct _EditorApp
 {
 	GtkApplication parent;
+	GArray *ground_types;
+	GArray *entity_types;
+	GArray *creature_types;
 };
 
 
@@ -63,6 +67,11 @@ editor_app_startup(GApplication *app)
 static void
 editor_app_init(EditorApp *app)
 {
+	app->ground_types = NULL;
+	app->creature_types = NULL;
+	app->entity_types = NULL;
+	struct creature test = { "test", 100 };
+	g_array_append_val(app->creature_types, test);
 }
 
 static void

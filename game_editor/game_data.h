@@ -15,18 +15,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _MAIN_WINDOW_H
-#define _MAIN_WINDOW_H
+#ifndef _ENTITY_H
+#define _ENTITY_H
 
-#include <gtk/gtk.h>
+struct entity {
+	char *name;
+	int weight;
+};
 
-#define GROUND_RES_ID "ground_res_id"
-#define ENTITY_RES_ID "entity_res_id"
-#define CREATURE_RES_ID "creature_res_id"
 
-#define EDITOR_MAIN_WINDOW_TYPE (editor_main_window_get_type ())
-G_DECLARE_FINAL_TYPE(EditorMainWindow, editor_main_window, EDITOR, MAIN_WINDOW, GtkApplicationWindow);
 
-EditorMainWindow *editor_main_window_new(EditorApp *app);
+struct ground {
+	char icon;
+};
 
+
+struct creature {
+	char *name;
+	int health;
+};
 #endif

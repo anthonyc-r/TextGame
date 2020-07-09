@@ -38,12 +38,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 							</object>
 						</child>
 						<child>
-							<object class="GtkComboBox" id="resource_combo_box">
+							<object class="GtkComboBoxText" id="res_combo">
 								<property name="visible">True</property>
+								<signal name="changed" handler="res_combo_changed" />
 							</object>
 						</child>
 						<child>
-							<object class="GtkStack" id="resource_stack">
+							<object class="GtkStack" id="res_stack">
 								<property name="visible">True</property>
 							</object>
 						</child>

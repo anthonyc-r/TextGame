@@ -24,22 +24,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 struct _EditorMainWindow
 {
 	GtkApplicationWindow parent;
+	GtkComboBoxText *res_combo;
+	GtkStack *res_stack;
 };
 
 G_DEFINE_TYPE(EditorMainWindow, editor_main_window, GTK_TYPE_APPLICATION_WINDOW);
+
+static void
+res_combo_changed(GtkComboBox *widget, gpointer user_data) 
+{
+	g_debug("changed combo box!");
+}
 
 static void
 editor_main_window_init(EditorMainWindow *window)
 {
 	gtk_widget_init_template(GTK_WIDGET(window));
 	gtk_window_set_titlebar(GTK_WINDOW(window), GTK_WIDGET(editor_headerbar_new()));
+	// setup res combo box
+	gtk_combo_box_text_append(window->res_combo, GROUND_RES_ID, "Ground");
+	gtk_combo_box_text_append(window->res_combo, CREATURE_RES_ID, "Creature");
+	gtk_combo_box_text_append(window->res_combo, ENTITY_RES_ID, "Entity");
+	gtk_combo_box_set_active(GTK_COMBO_BOX(window->res_combo), 0);
 }
 
 static void
 editor_main_window_class_init(EditorMainWindowClass *class)
 {
 	gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),  "/rocks/colourful/textgame/main_window.ui");
-	
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorMainWindow, res_combo);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorMainWindow, res_stack);
+	gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), res_combo_changed);
 }
 
 EditorMainWindow *
