@@ -67,11 +67,11 @@ editor_app_startup(GApplication *app)
 static void
 editor_app_init(EditorApp *app)
 {
-	app->ground_types = NULL;
-	app->creature_types = NULL;
-	app->entity_types = NULL;
-	struct creature test = { "test", 100 };
-	g_array_append_val(app->creature_types, test);
+	app->ground_types = g_array_new(FALSE, FALSE, sizeof (struct ground));
+	app->creature_types = g_array_new(FALSE, FALSE, sizeof (struct creature));
+	app->entity_types = g_array_new(FALSE, FALSE, sizeof (struct entity));
+	struct ground test = { "mud", 'm' };
+	g_array_append_val(app->ground_types, test);
 }
 
 static void

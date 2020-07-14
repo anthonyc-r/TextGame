@@ -47,6 +47,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 							<object class="GtkStack" id="res_stack">
 								<property name="visible">True</property>
 							</object>
+							<packing>
+								<property name="fill">True</property>
+								<property name="expand">True</property>
+							</packing>
 						</child>
 					</object>
 				</child>

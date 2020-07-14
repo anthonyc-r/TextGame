@@ -18,20 +18,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _ENTITY_H
 #define _ENTITY_H
 
+#define MAX_NAME 10
+
 struct entity {
-	char *name;
+	char name[MAX_NAME];
 	int weight;
 };
 
 
 
 struct ground {
+	char name[MAX_NAME];
 	char icon;
 };
 
 
 struct creature {
-	char *name;
+	char name[MAX_NAME];
 	int health;
 };
 #endif

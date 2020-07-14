@@ -21,19 +21,49 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "main_window.h"
 #include "headerbar.h"
 
+#define ADD_BOX(P, STACK, ID) \
+	P = GTK_BOX(gtk_box_new(GTK_ORIENTATION_VERTICAL, 0)); \
+	gtk_widget_show(GTK_WIDGET(P)); \
+	gtk_stack_add_named(STACK, GTK_WIDGET(P), ID);
+
+
 struct _EditorMainWindow
 {
 	GtkApplicationWindow parent;
+	
 	GtkComboBoxText *res_combo;
 	GtkStack *res_stack;
+	GtkBox *grounds_box;
+	GtkBox *ent_box;
+	GtkBox *creat_box;
 };
 
 G_DEFINE_TYPE(EditorMainWindow, editor_main_window, GTK_TYPE_APPLICATION_WINDOW);
 
 static void
-res_combo_changed(GtkComboBox *widget, gpointer user_data) 
+res_combo_changed(GtkComboBox *widget, EditorMainWindow *win) 
 {
-	g_debug("changed combo box!");
+	GtkWidget *btn;
+	EditorApp *app;
+	int active;
+	
+	app = EDITOR_APP(gtk_window_get_application(GTK_WINDOW(win)));
+	active = gtk_combo_box_get_active(widget);
+	g_debug("changed combo box %d!", active);
+	switch (active) {
+		case 0:
+			gtk_stack_set_visible_child_name(win->res_stack, GROUND_RES_ID);
+			btn = gtk_button_new_with_label("groundt");
+			gtk_widget_show(btn);
+			gtk_box_pack_start(win->grounds_box, btn, FALSE, FALSE, 0);
+			break;
+		case 1:
+			gtk_stack_set_visible_child_name(win->res_stack, CREATURE_RES_ID);
+			break;
+		case 2:
+			gtk_stack_set_visible_child_name(win->res_stack, ENTITY_RES_ID);
+			break;
+	}
 }
 
 static void
@@ -45,6 +75,11 @@ editor_main_window_init(EditorMainWindow *window)
 	gtk_combo_box_text_append(window->res_combo, GROUND_RES_ID, "Ground");
 	gtk_combo_box_text_append(window->res_combo, CREATURE_RES_ID, "Creature");
 	gtk_combo_box_text_append(window->res_combo, ENTITY_RES_ID, "Entity");
+	// Set up res stack
+	ADD_BOX(window->grounds_box, window->res_stack, GROUND_RES_ID);
+	ADD_BOX(window->creat_box, window->res_stack, CREATURE_RES_ID);
+	ADD_BOX(window->ent_box, window->res_stack, ENTITY_RES_ID);
+
 	gtk_combo_box_set_active(GTK_COMBO_BOX(window->res_combo), 0);
 }
 
