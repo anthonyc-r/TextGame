@@ -23,7 +23,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define EDITOR_APP_TYPE (editor_app_get_type ())
 G_DECLARE_FINAL_TYPE(EditorApp, editor_app, EDITOR, APP,  GtkApplication)
 
+EditorApp *current_app;
+
 EditorApp *editor_app_new();
+GtkTreeModel *editor_app_get_entity_tree_model(EditorApp *app);
+GtkTreeModel *editor_app_get_creature_tree_model(EditorApp *app);
+GtkTreeModel *editor_app_get_ground_tree_model(EditorApp *app);
 
 #endif
 

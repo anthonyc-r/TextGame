@@ -24,17 +24,16 @@ struct entity {
 	char name[MAX_NAME];
 	int weight;
 };
-
-
-
+struct creature {
+	char name[MAX_NAME];
+	int health;
+};
 struct ground {
 	char name[MAX_NAME];
 	char icon;
 };
 
-
-struct creature {
-	char name[MAX_NAME];
-	int health;
-};
+struct entity *new_entity(char *name, int weight);
+struct ground *new_ground(char *name, char icon);
+struct creature *new_creature(char *name, int health);
 #endif

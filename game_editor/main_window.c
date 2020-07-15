@@ -21,10 +21,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "main_window.h"
 #include "headerbar.h"
 
-#define ADD_BOX(P, STACK, ID) \
-	P = GTK_BOX(gtk_box_new(GTK_ORIENTATION_VERTICAL, 0)); \
+#define ADD_TREE(P, STACK, ID, MODEL) \
+	P = GTK_TREE_VIEW(gtk_tree_view_new_with_model(MODEL)); \
 	gtk_widget_show(GTK_WIDGET(P)); \
-	gtk_stack_add_named(STACK, GTK_WIDGET(P), ID);
+	gtk_stack_add_named(STACK, GTK_WIDGET(P), ID); \
+	gtk_tree_view_append_column(P, gtk_tree_view_column_new_with_attributes("Types", gtk_cell_renderer_text_new(), "text", 0, NULL));
 
 
 struct _EditorMainWindow
@@ -33,12 +34,13 @@ struct _EditorMainWindow
 	
 	GtkComboBoxText *res_combo;
 	GtkStack *res_stack;
-	GtkBox *grounds_box;
-	GtkBox *ent_box;
-	GtkBox *creat_box;
+	GtkTreeView *grounds_tree;
+	GtkTreeView *ent_tree;
+	GtkTreeView *creat_tree;
 };
 
 G_DEFINE_TYPE(EditorMainWindow, editor_main_window, GTK_TYPE_APPLICATION_WINDOW);
+
 
 static void
 res_combo_changed(GtkComboBox *widget, EditorMainWindow *win) 
@@ -53,9 +55,6 @@ res_combo_changed(GtkComboBox *widget, EditorMainWindow *win)
 	switch (active) {
 		case 0:
 			gtk_stack_set_visible_child_name(win->res_stack, GROUND_RES_ID);
-			btn = gtk_button_new_with_label("groundt");
-			gtk_widget_show(btn);
-			gtk_box_pack_start(win->grounds_box, btn, FALSE, FALSE, 0);
 			break;
 		case 1:
 			gtk_stack_set_visible_child_name(win->res_stack, CREATURE_RES_ID);
@@ -71,14 +70,15 @@ editor_main_window_init(EditorMainWindow *window)
 {
 	gtk_widget_init_template(GTK_WIDGET(window));
 	gtk_window_set_titlebar(GTK_WINDOW(window), GTK_WIDGET(editor_headerbar_new()));
+
 	// setup res combo box
 	gtk_combo_box_text_append(window->res_combo, GROUND_RES_ID, "Ground");
 	gtk_combo_box_text_append(window->res_combo, CREATURE_RES_ID, "Creature");
 	gtk_combo_box_text_append(window->res_combo, ENTITY_RES_ID, "Entity");
 	// Set up res stack
-	ADD_BOX(window->grounds_box, window->res_stack, GROUND_RES_ID);
-	ADD_BOX(window->creat_box, window->res_stack, CREATURE_RES_ID);
-	ADD_BOX(window->ent_box, window->res_stack, ENTITY_RES_ID);
+	ADD_TREE(window->grounds_tree, window->res_stack, GROUND_RES_ID, editor_app_get_ground_tree_model(current_app));
+	ADD_TREE(window->creat_tree, window->res_stack, CREATURE_RES_ID, editor_app_get_creature_tree_model(current_app));
+	ADD_TREE(window->ent_tree, window->res_stack, ENTITY_RES_ID, editor_app_get_entity_tree_model(current_app));
 
 	gtk_combo_box_set_active(GTK_COMBO_BOX(window->res_combo), 0);
 }

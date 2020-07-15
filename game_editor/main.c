@@ -22,5 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 int
 main(int argc, char **argv) 
 {
-	return g_application_run(G_APPLICATION(editor_app_new()), argc, argv);
+	current_app = editor_app_new();
+	return g_application_run(G_APPLICATION(current_app), argc, argv);
 }
