@@ -15,25 +15,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _GAME_EDITOR_H
-#define _GAME_EDITOR_H
+#ifndef _NEW_RESOURCE_WINDOW_H
+#define _NEW_RESOURCE_WINDOW_H
 
 #include <gtk/gtk.h>
 
-struct ground;
+enum resource_field_type {
+	RESOURCE_FIELD_STRING,
+	RESOURCE_FIELD_INT
+};
 
-#define EDITOR_APP_TYPE (editor_app_get_type ())
-G_DECLARE_FINAL_TYPE(EditorApp, editor_app, EDITOR, APP,  GtkApplication)
 
-EditorApp *current_app;
+#define EDITOR_CREATE_RESOURCE_WINDOW_TYPE (editor_create_resource_window_get_type ())
+G_DECLARE_FINAL_TYPE(EditorCreateResourceWindow, editor_create_resource_window, EDITOR, CREATE_RESOURCE_WINDOW, GtkApplicationWindow);
 
-EditorApp *editor_app_new();
-// remember to free the items when removed from these lists...
-GtkTreeModel *editor_app_get_entity_tree_model(EditorApp *app);
-GtkTreeModel *editor_app_get_creature_tree_model(EditorApp *app);
-GtkTreeModel *editor_app_get_ground_tree_model(EditorApp *app);
-
-void editor_app_add_ground(EditorApp *app, struct ground *ground);
+EditorCreateResourceWindow *editor_create_resource_window_new(EditorApp *app, ...);
 
 #endif
-

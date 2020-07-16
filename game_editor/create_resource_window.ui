@@ -1,4 +1,5 @@
-/*
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
 Copyright 2020 Anthony Cohn-Richardby
 
 This program is free software: you can redistribute it and/or modify
@@ -13,27 +14,17 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+-->
 
-#ifndef _GAME_EDITOR_H
-#define _GAME_EDITOR_H
-
-#include <gtk/gtk.h>
-
-struct ground;
-
-#define EDITOR_APP_TYPE (editor_app_get_type ())
-G_DECLARE_FINAL_TYPE(EditorApp, editor_app, EDITOR, APP,  GtkApplication)
-
-EditorApp *current_app;
-
-EditorApp *editor_app_new();
-// remember to free the items when removed from these lists...
-GtkTreeModel *editor_app_get_entity_tree_model(EditorApp *app);
-GtkTreeModel *editor_app_get_creature_tree_model(EditorApp *app);
-GtkTreeModel *editor_app_get_ground_tree_model(EditorApp *app);
-
-void editor_app_add_ground(EditorApp *app, struct ground *ground);
-
-#endif
-
+<interface>
+	<!-- gtk+3.8 -->
+	<template class="EditorCreateResourceWindow" parent="GtkApplicationWindow">
+		<property name="title">New Resource</property>
+		<property name="default-width">400</property>
+		<property name="default-height">600</property>
+		<child>
+			<object class="GtkBox">
+			</object>
+		</child>
+	</template>
+</interface>

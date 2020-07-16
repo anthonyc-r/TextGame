@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "app.h"
 #include "main_window.h"
 #include "game_data.h"
+#include "create_resource_window.h"
 
 struct _EditorApp
 {
@@ -51,10 +52,19 @@ quit_activated(GSimpleAction *action, GVariant *param, gpointer app)
 	g_application_quit(G_APPLICATION(app));
 }
 
+static void
+create_ground_activated(GSimpleAction *action, GVariant *param, gpointer p)
+{
+	g_debug("tapped create ground");
+	EditorCreateResourceWindow *window = editor_create_resource_window_new(current_app, NULL);
+	gtk_window_present(GTK_WINDOW(window));
+}
+
 
 static GActionEntry editor_app_entries[] = 
 {
-	{"quit", quit_activated, NULL, NULL, NULL }
+	{"quit", quit_activated, NULL, NULL, NULL },
+	{"create_ground", create_ground_activated, NULL, NULL, NULL}
 };
 
 static void
@@ -112,4 +122,12 @@ GtkTreeModel *
 editor_app_get_creature_tree_model(EditorApp *app)
 {
 	return GTK_TREE_MODEL(app->creature_types);
+}
+
+void 
+editor_app_add_ground(EditorApp *app, struct ground *ground)
+{
+	GtkTreeIter iter;
+	gtk_list_store_append(app->ground_types, &iter);
+	gtk_list_store_set(app->ground_types, &iter, 0, ground->name, 1, ground, -1);
 }

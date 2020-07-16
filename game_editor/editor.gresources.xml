@@ -9,4 +9,7 @@
 	<gresource prefix="/rocks/colourful/textgame">
 		<file preprocess="xml-stripblanks">menu.ui</file>
 	</gresource>
+	<gresource prefix="/rocks/colourful/textgame">
+		<file preprocess="xml-stripblanks">create_resource_window.ui</file>
+	</gresource>
 </gresources>
