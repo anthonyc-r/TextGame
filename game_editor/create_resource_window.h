@@ -21,7 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <gtk/gtk.h>
 
 enum resource_field_type {
+	_RESOURCE_FIELD_END,
 	RESOURCE_FIELD_STRING,
+	RESOURCE_FIELD_CHAR,
 	RESOURCE_FIELD_INT
 };
 

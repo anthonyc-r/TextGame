@@ -23,7 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<property name="default-width">400</property>
 		<property name="default-height">600</property>
 		<child>
-			<object class="GtkBox">
+			<object class="GtkBox" id="vbox">
+				<property name="orientation">vertical</property>
 			</object>
 		</child>
 	</template>

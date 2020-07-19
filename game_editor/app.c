@@ -56,7 +56,7 @@ static void
 create_ground_activated(GSimpleAction *action, GVariant *param, gpointer p)
 {
 	g_debug("tapped create ground");
-	EditorCreateResourceWindow *window = editor_create_resource_window_new(current_app, NULL);
+	EditorCreateResourceWindow *window = editor_create_resource_window_new(current_app, RESOURCE_FIELD_STRING, "name", RESOURCE_FIELD_CHAR, "icon", 0);
 	gtk_window_present(GTK_WINDOW(window));
 }
 
