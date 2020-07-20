@@ -28,16 +28,32 @@ struct _EditorCreateResourceWindow
 	void *value_holders;
 	enum resource_field_type *field_types;
 	char **field_titles;
-	GtkEntry *field_entries;
+	GtkEntry **field_entries;
 	int field_count;
 };
 
 G_DEFINE_TYPE(EditorCreateResourceWindow, editor_create_resource_window, GTK_TYPE_APPLICATION_WINDOW);
 
 static void
-editor_create_resource_window_add_field(GtkBox *box) 
+add_field_row(EditorCreateResourceWindow *window, int i) 
 {
+	char *title = window->field_titles[i];
+	g_debug("adding field %s", title);
+	GtkBox *hbox = GTK_BOX(gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0));
 	
+	GtkWidget *label = gtk_label_new(title);
+	GtkWidget *entry = gtk_entry_new();
+	gtk_box_pack_start(hbox, label, FALSE, FALSE, 10);
+	gtk_box_pack_start(hbox, entry, TRUE, TRUE, 10);
+	gtk_box_pack_start(window->vbox, GTK_WIDGET(hbox), FALSE, FALSE, 10);
+	gtk_widget_show_all(GTK_WIDGET(hbox));
+	window->field_entries[i] = GTK_ENTRY(entry);
+}
+
+static void
+clicked_done(GtkButton *button, gpointer user_data)
+{
+	g_debug("clicked done!");
 }
 
 static void
@@ -63,10 +79,12 @@ editor_create_resource_window_init(EditorCreateResourceWindow *window)
 static void
 editor_create_resource_window_class_init(EditorCreateResourceWindowClass *class)
 {
+	g_debug("res window class init");
 	G_OBJECT_CLASS(class)->finalize = editor_create_resource_window_finalize;
 
 	gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),  "/rocks/colourful/textgame/create_resource_window.ui");
 	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorCreateResourceWindow, vbox);
+	gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), clicked_done);
 }
 
 // Call like editor_create_resource_window_new(app, RESOURCE_FIELD_STRING, "name", RESOURCE_FIELD_INT, "hp", 0);
@@ -99,11 +117,9 @@ editor_create_resource_window_new(EditorApp *app, ...)
 	
 	// Setup ui fields
 	for (int i = 0; i < window->field_count; i++) {
-		g_debug("adding field %d, %s", i, window->field_titles[i]);
-		gtk_box_pack_start(window->vbox, gtk_label_new(window->field_titles[i]), FALSE, FALSE, 10);
+		add_field_row(window, i);
 	}
-	gtk_widget_show_all(GTK_WIDGET(window->vbox));
-	
+
 	return window;
 }
 

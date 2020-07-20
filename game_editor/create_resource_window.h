@@ -27,7 +27,6 @@ enum resource_field_type {
 	RESOURCE_FIELD_INT
 };
 
-
 #define EDITOR_CREATE_RESOURCE_WINDOW_TYPE (editor_create_resource_window_get_type ())
 G_DECLARE_FINAL_TYPE(EditorCreateResourceWindow, editor_create_resource_window, EDITOR, CREATE_RESOURCE_WINDOW, GtkApplicationWindow);
 

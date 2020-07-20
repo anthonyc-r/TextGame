@@ -22,9 +22,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<property name="title">New Resource</property>
 		<property name="default-width">400</property>
 		<property name="default-height">600</property>
+		<property name="border-width">10</property>
 		<child>
 			<object class="GtkBox" id="vbox">
 				<property name="orientation">vertical</property>
+				<property name="visible">True</property>
+				<child>
+					<object class="GtkButton" id="done_button">
+						<property name="label">Done</property>
+						<property name="visible">True</property>
+						<signal name="clicked" handler="clicked_done" />
+					</object>
+					<packing>
+						<property name="pack_type">end</property>
+					</packing>
+				</child>
 			</object>
 		</child>
 	</template>
