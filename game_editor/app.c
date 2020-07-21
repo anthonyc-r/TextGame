@@ -52,11 +52,23 @@ quit_activated(GSimpleAction *action, GVariant *param, gpointer app)
 	g_application_quit(G_APPLICATION(app));
 }
 
+static void 
+ground_created(void *userdata)
+{
+	struct ground *ground = userdata;
+	g_debug("ground created, name: %s, char: %c", ground->name, ground->icon);
+	editor_app_add_ground(current_app, ground);
+}
+
 static void
 create_ground_activated(GSimpleAction *action, GVariant *param, gpointer p)
 {
 	g_debug("tapped create ground");
-	EditorCreateResourceWindow *window = editor_create_resource_window_new(current_app, RESOURCE_FIELD_STRING, "name", RESOURCE_FIELD_CHAR, "icon", 0);
+	struct ground *ground = new_ground("", '-');
+	EditorCreateResourceWindow *window = editor_create_resource_window_new(current_app, ground_created, (void*)ground,
+		RESOURCE_FIELD_NAME, "name", &ground->name,
+		RESOURCE_FIELD_CHAR, "icon", &ground->icon, 
+		0);
 	gtk_window_present(GTK_WINDOW(window));
 }
 

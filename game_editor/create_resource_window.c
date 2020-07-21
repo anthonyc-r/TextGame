@@ -25,11 +25,13 @@ struct _EditorCreateResourceWindow
 {
 	GtkApplicationWindow parent;
 	GtkBox *vbox;
-	void *value_holders;
+	void **value_holders;
 	enum resource_field_type *field_types;
 	char **field_titles;
 	GtkEntry **field_entries;
 	int field_count;
+	void(*callback)(void*);
+	void *userdata;
 };
 
 G_DEFINE_TYPE(EditorCreateResourceWindow, editor_create_resource_window, GTK_TYPE_APPLICATION_WINDOW);
@@ -38,7 +40,6 @@ static void
 add_field_row(EditorCreateResourceWindow *window, int i) 
 {
 	char *title = window->field_titles[i];
-	g_debug("adding field %s", title);
 	GtkBox *hbox = GTK_BOX(gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0));
 	
 	GtkWidget *label = gtk_label_new(title);
@@ -50,10 +51,49 @@ add_field_row(EditorCreateResourceWindow *window, int i)
 	window->field_entries[i] = GTK_ENTRY(entry);
 }
 
-static void
-clicked_done(GtkButton *button, gpointer user_data)
+static void 
+set_name(char *dest, char const *src) 
 {
+	strncpy(dest, src, MAX_NAME);
+}
+static void
+set_char(char *dest, char const *src)
+{
+	*dest = *src;
+}
+static void
+set_int(int *dest, char const *src)
+{
+	*dest = -1;
+}
+
+static void
+clicked_done(GtkButton *button, EditorCreateResourceWindow *window)
+{
+	enum resource_field_type type;
+	void *dest;
+	char const *src;
 	g_debug("clicked done!");
+	for (int i = 0; i < window->field_count; i++) {
+		type = window->field_types[i];
+		dest = window->value_holders[i];
+		src = gtk_entry_get_text(window->field_entries[i]);
+		switch (type) {
+			case RESOURCE_FIELD_NAME:
+				set_name((char*)dest, src);
+				break;
+			case RESOURCE_FIELD_CHAR:
+				set_char((char*)dest, src);
+				break;
+			case RESOURCE_FIELD_INT:
+				set_int((int*)dest, src);
+				break;
+			default:
+				g_debug("unhandled resource field type!");
+		}
+		
+	}
+	window->callback(window->userdata);
 }
 
 static void
@@ -89,15 +129,16 @@ editor_create_resource_window_class_init(EditorCreateResourceWindowClass *class)
 
 // Call like editor_create_resource_window_new(app, RESOURCE_FIELD_STRING, "name", RESOURCE_FIELD_INT, "hp", 0);
 EditorCreateResourceWindow *
-editor_create_resource_window_new(EditorApp *app, ...)
+editor_create_resource_window_new(EditorApp *app, void(*callback)(void*), void *userdata, ...)
 {
 	g_debug("editor_create_resource_window_new...");
 	int argcount = 0;
 	EditorCreateResourceWindow *window = g_object_new(EDITOR_CREATE_RESOURCE_WINDOW_TYPE, "application", app, "title", "New Resource", NULL);
 	g_debug("config...");
 	va_list argp;
-	va_start(argp, app);
+	va_start(argp, userdata);
 	while (va_arg(argp, int) != (int)_RESOURCE_FIELD_END) {
+		va_arg(argp, char*);
 		va_arg(argp, void*);
 		argcount += 1;
 	}
@@ -106,11 +147,14 @@ editor_create_resource_window_new(EditorApp *app, ...)
 	window->field_titles = malloc(argcount * sizeof (char **));
 	window->field_entries = malloc(argcount * sizeof (GtkEntry *));
 	window->field_count = argcount;
+	window->callback = callback;
+	window->userdata = userdata;
 	
-	va_start(argp, app);
+	va_start(argp, userdata);
 	for (int i = 0; i < argcount; i++) {
 		window->field_types[i] = va_arg(argp, enum resource_field_type);
 		char *title = va_arg(argp, char*);
+		window->value_holders[i] = va_arg(argp, void*);
 		window->field_titles[i] = malloc(strlen(title) + 1);
 		strcpy(window->field_titles[i], title);
 	}
