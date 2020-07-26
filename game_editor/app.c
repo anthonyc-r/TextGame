@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 struct _EditorApp
 {
 	GtkApplication parent;
+	EditorMainWindow *main_window;
 	GtkListStore *ground_types;
 	GtkListStore *entity_types;
 	GtkListStore *creature_types;
@@ -42,7 +43,7 @@ editor_app_activate(GApplication *app)
 
 	g_debug("app activated");	
 	window = editor_main_window_new(EDITOR_APP(app));
-
+	EDITOR_APP(app)->main_window = window;
 	gtk_window_present(GTK_WINDOW(window));
 }
 
@@ -72,10 +73,70 @@ create_ground_activated(GSimpleAction *action, GVariant *param, gpointer p)
 	gtk_window_present(GTK_WINDOW(window));
 }
 
+/**
+GtkWidget *dialog;
+GtkFileChooserAction action = GTK_FILE_CHOOSER_ACTION_OPEN;
+gint res;
+
+dialog = gtk_file_chooser_dialog_new ("Open File",
+                                      parent_window,
+                                      action,
+                                      _("_Cancel"),
+                                      GTK_RESPONSE_CANCEL,
+                                      _("_Open"),
+                                      GTK_RESPONSE_ACCEPT,
+                                      NULL);
+
+res = gtk_dialog_run (GTK_DIALOG (dialog));
+if (res == GTK_RESPONSE_ACCEPT)
+  {
+    char *filename;
+    GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
+    filename = gtk_file_chooser_get_filename (chooser);
+    open_file (filename);
+    g_free (filename);
+  }
+
+gtk_widget_destroy (dialog);
+**/
+
+static void
+load_game_activated(GSimpleAction *action, GVariant *param, gpointer p)
+{
+	g_debug("tapped load game");
+	struct ground **grounds;
+	struct entity **entities;
+	struct creature **creatures;
+	GtkWidget *dialog = gtk_file_chooser_dialog_new(
+		"Load Game Data",
+		GTK_WINDOW(current_app->main_window), 
+		GTK_FILE_CHOOSER_ACTION_OPEN,
+		"Cancel", GTK_RESPONSE_CANCEL,
+		"Load", GTK_RESPONSE_ACCEPT, NULL);
+	int result = gtk_dialog_run(GTK_DIALOG(dialog));
+	char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+	load_game_data(filename, &entities, &grounds, &creatures);
+	g_debug("game data loaded");
+	free(filename);
+	gtk_widget_destroy(dialog);
+	while (*grounds != NULL) {
+		editor_app_add_ground(current_app, *grounds);
+		grounds++;
+	}
+	while (*entities != NULL) {
+		editor_app_add_entity(current_app, *entities);
+		entities++;
+	}
+	while (*creatures != NULL) {
+		editor_app_add_creature(current_app, *creatures);
+		creatures++;
+	}
+}
 
 static GActionEntry editor_app_entries[] = 
 {
 	{"quit", quit_activated, NULL, NULL, NULL },
+	{"load_game", load_game_activated, NULL, NULL, NULL},
 	{"create_ground", create_ground_activated, NULL, NULL, NULL}
 };
 
@@ -142,4 +203,18 @@ editor_app_add_ground(EditorApp *app, struct ground *ground)
 	GtkTreeIter iter;
 	gtk_list_store_append(app->ground_types, &iter);
 	gtk_list_store_set(app->ground_types, &iter, 0, ground->name, 1, ground, -1);
+}
+void 
+editor_app_add_creature(EditorApp *app, struct creature *creature)
+{
+	GtkTreeIter iter;
+	gtk_list_store_append(app->creature_types, &iter);
+	gtk_list_store_set(app->creature_types, &iter, 0, creature->name, 1, creature, -1);
+}
+void 
+editor_app_add_entity(EditorApp *app, struct entity *entity)
+{
+	GtkTreeIter iter;
+	gtk_list_store_append(app->entity_types, &iter);
+	gtk_list_store_set(app->entity_types, &iter, 0, entity->name, 1, entity, -1);
 }

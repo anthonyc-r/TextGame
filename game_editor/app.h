@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <gtk/gtk.h>
 
 struct ground;
+struct creature;
+struct entity;
 
 #define EDITOR_APP_TYPE (editor_app_get_type ())
 G_DECLARE_FINAL_TYPE(EditorApp, editor_app, EDITOR, APP,  GtkApplication)
@@ -34,6 +36,7 @@ GtkTreeModel *editor_app_get_creature_tree_model(EditorApp *app);
 GtkTreeModel *editor_app_get_ground_tree_model(EditorApp *app);
 
 void editor_app_add_ground(EditorApp *app, struct ground *ground);
-
+void editor_app_add_creature(EditorApp *app, struct creature *creature);
+void editor_app_add_entity(EditorApp *app, struct entity *entity);
 #endif
 

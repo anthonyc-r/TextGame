@@ -1,0 +1,37 @@
+bronze sword	/	1100	SIZE_SMALL
+iron sword	/	1000	SIZE_SMALL
+steel sword	/	1000	SIZE_SMALL
+rock	*	5000	SIZE_TINY
+bronze ingot	=	2200	SIZE_TINY
+iron ingot	=	2000	SIZE_TINY
+steel ingot	=	2000	SIZE_TINY
+wooden block	=	1500	SIZE_SMALL
+wooden table	T	500	SIZE_LARGE
+iron table	T	1000	SIZE_LARGE
+wooden door	|	500	SIZE_HUGE
+iron door	|	1000	SIZE_HUGE
+wooden chair	h	400	SIZE_LARGE
+iron chair	h	600	SIZE_LARGE
+stick	-	1500	SIZE_SMALL
+apple	a	1500	SIZE_TINY
+entrance	|	10000	SIZE_LARGE
+	
+mud	#
+grass	"
+rock	}
+stone	]
+slime	~
+	
+Player	100	100	10	-
+rat	100	100	0	-
+boar	110	100	0	-
+slime	120	100	0	-
+Dar'nka	150	100	10	An unusually large rat
+	
+footsteps	...tap...tap...tap...
+thud	THUD
+clang	CLANG
+door_open	eeeeaaak-
+door_close	SLAM
+	
+	

@@ -107,6 +107,10 @@ load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, str
 	char linebuff[MAX_LINE];
 	FILE *file = fopen(inpath, "r");
 	
+	ecount = 0;
+	ccount = 0;
+	gcount = 0;
+	scount = 0;
 	while (*fgets(linebuff, MAX_LINE, file) != '\t')
 		ecount++;
 	while (*fgets(linebuff, MAX_LINE, file) != '\t')
@@ -116,9 +120,11 @@ load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, str
 	while (*fgets(linebuff, MAX_LINE, file) != '\t')
 		scount++;
 	
-	struct entity **ents = malloc(ecount * sizeof(struct entity*));
-	struct ground **grounds = malloc(gcount * sizeof(struct ground*));
-	struct creature **creatures = malloc(ccount * sizeof(struct creatures*));
+	printf("ecount: %d, gcount: %d, ccount: %d\n", ecount, gcount, ccount);
+	
+	struct entity **ents = malloc(ecount * sizeof(struct entity*) + 1);
+	struct ground **grounds = malloc(gcount * sizeof(struct ground*) + 1);
+	struct creature **creatures = malloc(ccount * sizeof(struct creatures*) + 1);
 
 	fseek(file, 0, SEEK_SET);
 	int i = 0;
@@ -131,6 +137,7 @@ load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, str
 		enum size_type size = entity_size(strtok(NULL, "\t"));
 		ents[i++] = new_entity(name, "No description", *icon, weight, size);
 	}
+	ents[i] = NULL;
 	i = 0;
 	while (*(line = fgets(linebuff, MAX_LINE, file)) != '\t') {
 		printf("loading ground %d with data '%s'\n", i, line);
@@ -138,6 +145,7 @@ load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, str
 		char *icon = strtok(NULL, "\t");
 		grounds[i++] = new_ground(name, *icon);
 	}
+	grounds[i] = NULL;
 	i = 0;
 	while (*(line = fgets(linebuff, MAX_LINE, file)) != '\t') {
 		printf("loading creature %d with data '%s'\n", i, line);
@@ -147,6 +155,7 @@ load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, str
 		int inventory_size = (int)strtol(strtok(NULL, "\t"), NULL, 10);
 		creatures[i++] = new_creature(name, "No description", health, tp, inventory_size);
 	}
+	creatures[i] = NULL;
 	
 	*edest = ents;
 	*gdest = grounds;
