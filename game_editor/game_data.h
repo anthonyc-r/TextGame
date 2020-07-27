@@ -52,7 +52,7 @@ struct ground *new_ground(char *name, char icon);
 struct creature *new_creature(char *name, char *desc, int health, int tp, int inventory_size);
 
 // Expects null terminated arrays
-void save_game_data(char *outpath, struct entity *entities, struct ground *grounds, struct creature *creatures);
+void save_game_data(char *outpath, struct entity **entities, struct ground **grounds, struct creature **creatures);
 // Allocates memory
 void load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, struct creature ***cdest);
 #endif

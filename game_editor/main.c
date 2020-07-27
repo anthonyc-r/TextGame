@@ -18,10 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <gtk/gtk.h>
 
 #include "app.h"
+#include "game_data.h"
 
 int
 main(int argc, char **argv) 
 {
+	struct entity ent = {"test ent", "a thing", 'e', 1231, SIZE_TINY };
+	struct ground ground = { "mud", 'm' };
+	struct creature creature = { "test name", "a creature", 100, 99, 5 };
+	struct entity *ents[3] = { &ent, &ent, NULL };
+	struct ground *grounds[3] = { &ground, &ground, NULL };
+	struct creature *creatures[3] = { &creature, &creature, &creature };
+	save_game_data("./savetest.dat", ents, grounds, creatures);
+	
+	
 	current_app = editor_app_new();
 	return g_application_run(G_APPLICATION(current_app), argc, argv);
 }

@@ -73,32 +73,19 @@ create_ground_activated(GSimpleAction *action, GVariant *param, gpointer p)
 	gtk_window_present(GTK_WINDOW(window));
 }
 
-/**
-GtkWidget *dialog;
-GtkFileChooserAction action = GTK_FILE_CHOOSER_ACTION_OPEN;
-gint res;
-
-dialog = gtk_file_chooser_dialog_new ("Open File",
-                                      parent_window,
-                                      action,
-                                      _("_Cancel"),
-                                      GTK_RESPONSE_CANCEL,
-                                      _("_Open"),
-                                      GTK_RESPONSE_ACCEPT,
-                                      NULL);
-
-res = gtk_dialog_run (GTK_DIALOG (dialog));
-if (res == GTK_RESPONSE_ACCEPT)
-  {
-    char *filename;
-    GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
-    filename = gtk_file_chooser_get_filename (chooser);
-    open_file (filename);
-    g_free (filename);
-  }
-
-gtk_widget_destroy (dialog);
-**/
+static void
+save_game_activated(GSimpleAction *action, GVariant *param, gpointer p)
+{
+	int nground, ncreature, nent;
+	GtkTreeModel *model = GTK_TREE_MODEL(current_app->ground_types);
+	GtkTreeIter iter;
+	GValue value;
+	if (gtk_tree_model_get_iter_first(model, &iter)) {
+		do {
+			gtk_tree_model_get_value(model, &iter, 1, &value);
+		} while (gtk_tree_model_iter_next(model, &iter));
+	}
+}
 
 static void
 load_game_activated(GSimpleAction *action, GVariant *param, gpointer p)
@@ -137,6 +124,7 @@ static GActionEntry editor_app_entries[] =
 {
 	{"quit", quit_activated, NULL, NULL, NULL },
 	{"load_game", load_game_activated, NULL, NULL, NULL},
+	{"save_game", save_game_activated, NULL, NULL, NULL},
 	{"create_ground", create_ground_activated, NULL, NULL, NULL}
 };
 

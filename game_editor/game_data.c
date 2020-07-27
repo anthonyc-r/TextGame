@@ -77,11 +77,41 @@ sizestr(enum size_type type)
 			return "SIZE_TINY";
 	}
 }
-
 void 
-save_game_data(char *outpath, struct entity *entities, struct ground *grounds, struct creature *creatures)
+save_game_data(char *outpath, struct entity **entities, struct ground **grounds, struct creature **creatures)
 {
-	FILE *file = fopen(outpath, "r");
+	FILE *file = fopen(outpath, "w+");
+	struct entity *ent;
+	struct creature *creat;
+	struct ground *ground;
+	while ((ent = *entities) != NULL) {
+		fprintf(file, "%s\t%c\t%d\t%s\n",
+			ent->name,
+			ent->icon,
+			ent->weight,
+			sizestr(ent->size_class));
+		entities++;
+	}
+	fprintf(file, "\t\n");
+	while ((ground = *grounds) != NULL) {
+		fprintf(file, "%s\t%c\n",
+			ground->name,
+			ground->icon);
+		grounds++;
+	}
+	fprintf(file, "\t\n");
+	while ((creat = *creatures) != NULL) {
+		fprintf(file, "%s\t%d\t%d\t%d\t%s\n",
+			creat->name,
+			creat->health,
+			creat->tp,
+			creat->inventory_size,
+			creat->desc);
+		creatures++;
+	}
+	fprintf(file, "\t\n");
+	fprintf(file, "\t\n");
+	fclose(file);
 }
 
 enum size_type 
@@ -160,4 +190,5 @@ load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, str
 	*edest = ents;
 	*gdest = grounds;
 	*cdest = creatures;
+	fclose(file);
 }
