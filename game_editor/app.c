@@ -73,18 +73,78 @@ create_ground_activated(GSimpleAction *action, GVariant *param, gpointer p)
 	gtk_window_present(GTK_WINDOW(window));
 }
 
+static int
+count_model(GtkTreeModel *model)
+{
+	GtkTreeIter iter;
+	int count = 0;
+	if (gtk_tree_model_get_iter_first(model, &iter)) {
+		do {
+			count++;
+		} while (gtk_tree_model_iter_next(model, &iter));
+	}
+	return count;
+}
+
 static void
 save_game_activated(GSimpleAction *action, GVariant *param, gpointer p)
 {
-	int nground, ncreature, nent;
+	int nground, ncreature, nentity, count;
+	nground = count_model(GTK_TREE_MODEL(current_app->ground_types));
+	ncreature = count_model(GTK_TREE_MODEL(current_app->creature_types));
+	nentity = count_model(GTK_TREE_MODEL(current_app->entity_types));
+	g_debug("counted list lengths %d, %d, %d", nground, ncreature, nentity);
+	struct ground **grounds = malloc((nground + 1) * sizeof (struct ground*));
+	struct creature **creatures = malloc((ncreature + 1) * sizeof (struct creature*));
+	struct entity **entities = malloc((nentity + 1) * sizeof (struct entity*));
 	GtkTreeModel *model = GTK_TREE_MODEL(current_app->ground_types);
 	GtkTreeIter iter;
-	GValue value;
+	void *value;
+	count = 0;
 	if (gtk_tree_model_get_iter_first(model, &iter)) {
 		do {
-			gtk_tree_model_get_value(model, &iter, 1, &value);
+			gtk_tree_model_get(model, &iter, 1, &value, -1);
+			grounds[count++] = (struct ground*)value;
 		} while (gtk_tree_model_iter_next(model, &iter));
 	}
+	grounds[count] = NULL;
+	model = GTK_TREE_MODEL(current_app->creature_types);
+	count = 0;
+	if (gtk_tree_model_get_iter_first(model, &iter)) {
+		do {
+			gtk_tree_model_get(model, &iter, 1,  &value, -1);
+			creatures[count++] = (struct creature*)value;
+		} while (gtk_tree_model_iter_next(model, &iter));
+	}
+	creatures[count] = NULL;
+	model = GTK_TREE_MODEL(current_app->entity_types);
+	count = 0;
+	if (gtk_tree_model_get_iter_first(model, &iter)) {
+		do {
+			gtk_tree_model_get(model, &iter, 1, &value, -1);
+			entities[count++] = (struct entity*)value;
+		} while (gtk_tree_model_iter_next(model, &iter));
+	}
+	entities[count] = NULL;
+	GtkWidget *dialog = gtk_file_chooser_dialog_new(
+		"Save Game Data",
+		GTK_WINDOW(current_app->main_window), 
+		GTK_FILE_CHOOSER_ACTION_SAVE,
+		"Cancel", GTK_RESPONSE_CANCEL,
+		"Save", GTK_RESPONSE_ACCEPT, NULL);
+	int result = gtk_dialog_run(GTK_DIALOG(dialog));
+	if (result != GTK_RESPONSE_ACCEPT) {
+		gtk_widget_destroy(dialog);
+		return;
+	}
+	char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+	gtk_widget_destroy(dialog);
+	save_game_data(filename, entities, grounds, creatures);
+	free(filename);
+	free(grounds);
+	free(entities);
+	free(creatures);
+	g_debug("saved");
 }
 
 static void
@@ -101,11 +161,15 @@ load_game_activated(GSimpleAction *action, GVariant *param, gpointer p)
 		"Cancel", GTK_RESPONSE_CANCEL,
 		"Load", GTK_RESPONSE_ACCEPT, NULL);
 	int result = gtk_dialog_run(GTK_DIALOG(dialog));
+	if (result != GTK_RESPONSE_ACCEPT) {
+		gtk_widget_destroy(dialog);
+		return;
+	}
 	char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+	gtk_widget_destroy(dialog);
 	load_game_data(filename, &entities, &grounds, &creatures);
 	g_debug("game data loaded");
 	free(filename);
-	gtk_widget_destroy(dialog);
 	while (*grounds != NULL) {
 		editor_app_add_ground(current_app, *grounds);
 		grounds++;
