@@ -30,11 +30,11 @@ struct _EditorApp
 	GtkListStore *ground_types;
 	GtkListStore *entity_types;
 	GtkListStore *creature_types;
+	struct map *map;
 };
 
 
 G_DEFINE_TYPE(EditorApp, editor_app, GTK_TYPE_APPLICATION);
-
 
 static void
 editor_app_activate(GApplication *app)
@@ -205,6 +205,7 @@ editor_app_init(EditorApp *app)
 	app->ground_types = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_POINTER);
 	app->creature_types = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_POINTER);
 	app->entity_types = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_POINTER);
+	app->map = new_map(10, 10);
 	
 	// some example dat
 	GtkTreeIter iter;
@@ -269,4 +270,10 @@ editor_app_add_entity(EditorApp *app, struct entity *entity)
 	GtkTreeIter iter;
 	gtk_list_store_append(app->entity_types, &iter);
 	gtk_list_store_set(app->entity_types, &iter, 0, entity->name, 1, entity, -1);
+}
+
+struct map *
+editor_app_get_map(EditorApp *app)
+{
+	return app->map;
 }

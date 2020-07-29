@@ -192,3 +192,28 @@ load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, str
 	*cdest = creatures;
 	fclose(file);
 }
+
+struct map *
+new_map(int width, int height) 
+{
+	struct map *map = malloc(sizeof (struct map));
+	map->width = width;
+	map->height = height;
+	map->cells = calloc(width * height, sizeof (struct cell));
+	return map;
+}
+
+void 
+destroy_map(struct map *map)
+{
+	free(map->cells);
+	free(map);
+}
+
+struct cell *
+map_get_cell(struct map *map, int x, int y)
+{
+	return map->cells + (y * map->height + x);
+}
+
+

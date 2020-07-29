@@ -38,5 +38,6 @@ GtkTreeModel *editor_app_get_ground_tree_model(EditorApp *app);
 void editor_app_add_ground(EditorApp *app, struct ground *ground);
 void editor_app_add_creature(EditorApp *app, struct creature *creature);
 void editor_app_add_entity(EditorApp *app, struct entity *entity);
+struct map *editor_app_get_map(EditorApp *app);
 #endif
 

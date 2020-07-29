@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "app.h"
 #include "main_window.h"
 #include "headerbar.h"
+#include "game_data.h"
 
 #define ADD_TREE(P, STACK, ID, MODEL) \
 	P = GTK_TREE_VIEW(gtk_tree_view_new_with_model(MODEL)); \
@@ -32,6 +33,7 @@ struct _EditorMainWindow
 {
 	GtkApplicationWindow parent;
 	
+	GtkGrid *map_grid;
 	GtkComboBoxText *res_combo;
 	GtkStack *res_stack;
 	GtkTreeView *grounds_tree;
@@ -41,6 +43,25 @@ struct _EditorMainWindow
 
 G_DEFINE_TYPE(EditorMainWindow, editor_main_window, GTK_TYPE_APPLICATION_WINDOW);
 
+
+static void
+setup_map_grid(GtkGrid *map_grid, struct map *map)
+{
+	g_debug("set up map grid!");
+	for (int i = 0; i < map->width; i++) {
+		gtk_grid_insert_column(map_grid, 0);
+	}
+	for (int i = 0; i < map->height; i++) {
+		gtk_grid_insert_row(map_grid, 0);
+	}
+	for (int y = 0; y < map->height; y++) {
+		for (int x = 0; x < map->width; x++) {
+			GtkWidget *btn = gtk_button_new_with_label("X");
+			gtk_grid_attach(map_grid, btn, x, y, 1, 1);
+			gtk_widget_show(btn);
+		}
+	}
+}
 
 static void
 res_combo_changed(GtkComboBox *widget, EditorMainWindow *win) 
@@ -79,8 +100,9 @@ editor_main_window_init(EditorMainWindow *window)
 	ADD_TREE(window->grounds_tree, window->res_stack, GROUND_RES_ID, editor_app_get_ground_tree_model(current_app));
 	ADD_TREE(window->creat_tree, window->res_stack, CREATURE_RES_ID, editor_app_get_creature_tree_model(current_app));
 	ADD_TREE(window->ent_tree, window->res_stack, ENTITY_RES_ID, editor_app_get_entity_tree_model(current_app));
-
 	gtk_combo_box_set_active(GTK_COMBO_BOX(window->res_combo), 0);
+	// map
+	setup_map_grid(window->map_grid, editor_app_get_map(current_app));
 }
 
 static void
@@ -89,6 +111,7 @@ editor_main_window_class_init(EditorMainWindowClass *class)
 	gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),  "/rocks/colourful/textgame/main_window.ui");
 	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorMainWindow, res_combo);
 	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorMainWindow, res_stack);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorMainWindow, map_grid);
 	gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), res_combo_changed);
 }
 

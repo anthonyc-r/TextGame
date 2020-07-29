@@ -46,12 +46,28 @@ struct ground {
 	char name[MAX_NAME];
 	char icon;
 };
+struct cell {
+	struct ground *ground;
+	int entityCount;
+	struct entity *entities;
+	struct creature *creature;
+};
+struct map {
+	int width, height;
+	struct cell *cells;
+};
 
 struct entity *new_entity(char *name, char *desc, char icon, int weight, enum size_type size_class);
 struct ground *new_ground(char *name, char icon);
 struct creature *new_creature(char *name, char *desc, int health, int tp, int inventory_size);
 
-// Expects null terminated arrays
+// MAP MANAGEMENT
+struct map *new_map(int width, int height);
+void destroy_map(struct map *map);
+struct cell *map_get_cell(struct map *map, int x, int y);
+
+
+// SAVE / LOAD Expects null terminated arrays
 void save_game_data(char *outpath, struct entity **entities, struct ground **grounds, struct creature **creatures);
 // Allocates memory
 void load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, struct creature ***cdest);
