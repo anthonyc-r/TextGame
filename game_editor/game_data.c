@@ -199,7 +199,19 @@ new_map(int width, int height)
 	struct map *map = malloc(sizeof (struct map));
 	map->width = width;
 	map->height = height;
-	map->cells = calloc(width * height, sizeof (struct cell));
+	map->cells = malloc(width * height * sizeof (struct cell));
+	struct cell *cell;
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {
+			cell = map->cells + (height * y + x);
+			cell->x = x;
+			cell->y = y;
+			cell->ground = NULL;
+			cell->entity_count = 0;
+			cell->entities = NULL;
+			cell->creature = NULL;
+		}
+	}
 	return map;
 }
 

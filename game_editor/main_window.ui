@@ -55,8 +55,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					</object>
 				</child>
 				<child>
-					<object class="GtkGrid" id="map_grid">
+					<object class="GtkScrolledWindow">
 						<property name="visible">True</property>
+						<child>
+							<object class="GtkGrid" id="map_grid">
+								<property name="visible">True</property>
+							</object>
+						</child>
 					</object>
 					<packing>
 						<property name="fill">True</property>

@@ -47,8 +47,10 @@ struct ground {
 	char icon;
 };
 struct cell {
+	int x;
+	int y;
 	struct ground *ground;
-	int entityCount;
+	int entity_count;
 	struct entity *entities;
 	struct creature *creature;
 };

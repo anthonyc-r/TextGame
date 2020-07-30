@@ -24,6 +24,14 @@ struct ground;
 struct creature;
 struct entity;
 
+enum active_item_type {
+	ACTIVE_ITEM_NONE,
+	ACTIVE_ITEM_GROUND,
+	ACTIVE_ITEM_CREATURE,
+	ACTIVE_ITEM_ENTITY,
+	ACTIVE_ITEM_CELL
+};
+
 #define EDITOR_APP_TYPE (editor_app_get_type ())
 G_DECLARE_FINAL_TYPE(EditorApp, editor_app, EDITOR, APP,  GtkApplication)
 
@@ -39,5 +47,6 @@ void editor_app_add_ground(EditorApp *app, struct ground *ground);
 void editor_app_add_creature(EditorApp *app, struct creature *creature);
 void editor_app_add_entity(EditorApp *app, struct entity *entity);
 struct map *editor_app_get_map(EditorApp *app);
+void editor_app_set_active_item(EditorApp *app, enum active_item_type active_item_type, void *item);
 #endif
 

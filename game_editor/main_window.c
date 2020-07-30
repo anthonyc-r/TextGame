@@ -26,8 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	P = GTK_TREE_VIEW(gtk_tree_view_new_with_model(MODEL)); \
 	gtk_widget_show(GTK_WIDGET(P)); \
 	gtk_stack_add_named(STACK, GTK_WIDGET(P), ID); \
-	gtk_tree_view_append_column(P, gtk_tree_view_column_new_with_attributes("Types", gtk_cell_renderer_text_new(), "text", 0, NULL));
-
+	gtk_tree_view_append_column(P, gtk_tree_view_column_new_with_attributes("Types", gtk_cell_renderer_text_new(), "text", 0, NULL));	
 
 struct _EditorMainWindow
 {
@@ -43,6 +42,17 @@ struct _EditorMainWindow
 
 G_DEFINE_TYPE(EditorMainWindow, editor_main_window, GTK_TYPE_APPLICATION_WINDOW);
 
+struct point {
+	int x, y;
+};
+
+static void
+grid_button_clicked(GtkButton *button, gpointer user_data)
+{
+	struct cell *cell = (struct cell*)user_data;
+	g_debug("clicked cell at (%d, %d)", cell->x, cell->y);
+	editor_app_set_active_item(current_app, ACTIVE_ITEM_CELL, (void*)cell);
+}
 
 static void
 setup_map_grid(GtkGrid *map_grid, struct map *map)
@@ -58,6 +68,7 @@ setup_map_grid(GtkGrid *map_grid, struct map *map)
 		for (int x = 0; x < map->width; x++) {
 			GtkWidget *btn = gtk_button_new_with_label("X");
 			gtk_grid_attach(map_grid, btn, x, y, 1, 1);
+			g_signal_connect(G_OBJECT(btn), "clicked", G_CALLBACK(grid_button_clicked), map_get_cell(map, x, y));
 			gtk_widget_show(btn);
 		}
 	}
