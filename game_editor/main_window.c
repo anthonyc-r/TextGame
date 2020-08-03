@@ -50,7 +50,6 @@ static void
 grid_button_clicked(GtkButton *button, gpointer user_data)
 {
 	struct cell *cell = (struct cell*)user_data;
-	g_debug("clicked cell at (%d, %d)", cell->x, cell->y);
 	editor_app_set_active_item(current_app, ACTIVE_ITEM_CELL, (void*)cell);
 }
 
@@ -71,6 +70,32 @@ setup_map_grid(GtkGrid *map_grid, struct map *map)
 			g_signal_connect(G_OBJECT(btn), "clicked", G_CALLBACK(grid_button_clicked), map_get_cell(map, x, y));
 			gtk_widget_show(btn);
 		}
+	}
+}
+
+static void
+tree_view_row_activated(GtkTreeView *tree_view, gpointer user_data)
+{
+	EditorMainWindow *window = EDITOR_MAIN_WINDOW(user_data);
+	GtkTreePath *path;
+	gtk_tree_view_get_cursor(tree_view, &path, NULL);
+	if (path == NULL) {
+		g_debug("null path, row activated");
+		return;
+	}
+	GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+	GtkTreeIter iter;
+	gtk_tree_model_get_iter(model, &iter, path);
+	void *item;
+	gtk_tree_model_get(model, &iter, 1, &item, -1);
+	gtk_tree_path_free(path);
+
+	if (tree_view == window->grounds_tree) {
+		editor_app_set_active_item(current_app, ACTIVE_ITEM_GROUND, item);
+	} else if (tree_view == window->ent_tree) {
+		editor_app_set_active_item(current_app, ACTIVE_ITEM_ENTITY, item);
+	} else if (tree_view == window->creat_tree) {
+		editor_app_set_active_item(current_app, ACTIVE_ITEM_CREATURE, item);
 	}
 }
 
@@ -111,6 +136,9 @@ editor_main_window_init(EditorMainWindow *window)
 	ADD_TREE(window->grounds_tree, window->res_stack, GROUND_RES_ID, editor_app_get_ground_tree_model(current_app));
 	ADD_TREE(window->creat_tree, window->res_stack, CREATURE_RES_ID, editor_app_get_creature_tree_model(current_app));
 	ADD_TREE(window->ent_tree, window->res_stack, ENTITY_RES_ID, editor_app_get_entity_tree_model(current_app));
+	g_signal_connect(G_OBJECT(window->grounds_tree), "cursor-changed", G_CALLBACK(tree_view_row_activated), window);
+	g_signal_connect(G_OBJECT(window->creat_tree), "cursor-changed", G_CALLBACK(tree_view_row_activated), window);
+	g_signal_connect(G_OBJECT(window->ent_tree), "cursor-changed", G_CALLBACK(tree_view_row_activated), window);
 	gtk_combo_box_set_active(GTK_COMBO_BOX(window->res_combo), 0);
 	// map
 	setup_map_grid(window->map_grid, editor_app_get_map(current_app));
