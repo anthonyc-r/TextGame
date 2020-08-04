@@ -31,8 +31,6 @@ struct _EditorApp
 	GtkListStore *entity_types;
 	GtkListStore *creature_types;
 	struct map *map;
-	void *active_item;
-	enum active_item_type active_item_type;
 };
 
 
@@ -208,8 +206,6 @@ editor_app_init(EditorApp *app)
 	app->creature_types = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_POINTER);
 	app->entity_types = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_POINTER);
 	app->map = new_map(10, 10);
-	app->active_item = NULL;
-	app->active_item_type = ACTIVE_ITEM_NONE;
 	// some example dat
 	GtkTreeIter iter;
 	gtk_list_store_append(app->ground_types, &iter);
@@ -279,13 +275,4 @@ struct map *
 editor_app_get_map(EditorApp *app)
 {
 	return app->map;
-}
-
-
-void
-editor_app_set_active_item(EditorApp *app, enum active_item_type active_item_type, void *item)
-{
-	g_debug("updated active item");
-	app->active_item = item;
-	app->active_item_type = active_item_type;
 }

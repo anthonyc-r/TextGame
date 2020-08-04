@@ -17,65 +17,75 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <interface>
-	<!-- gtk+3.8 -->
-	<template class="EditorMainWindow" parent="GtkApplicationWindow">
-		<property name="title">Game Editor</property>
-		<property name="default-width">800</property>
-		<property name="default-height">600</property>
+	<template class="EditorPropertiesView" parent="GtkBox">
+		<property name="visible">True</property>
+		<property name="orientation">vertical</property>
 		<child>
-			<object class="GtkBox">
+			<object class="GtkLabel">
 				<property name="visible">True</property>
-				<property name="orientation">horizontal</property>
+				<property name="label">Properties</property>
+			</object>
+		</child>
+		<child>
+			<object class="GtkStack" id="stack">
+				<property name="visible">True</property>				
+
+				<!-- GROUND PROPS -->
 				<child>
-					<object class="GtkBox">
+					<object class="GtkBox" id="ground_props">
 						<property name="visible">True</property>
 						<property name="orientation">vertical</property>
-						<property name="width-request">200</property>
 						<child>
 							<object class="GtkLabel">
 								<property name="visible">True</property>
-								<property name="label">Resources</property>
-							</object>
-						</child>
-						<child>
-							<object class="GtkComboBoxText" id="res_combo">
-								<property name="visible">True</property>
-								<signal name="changed" handler="res_combo_changed" />
-							</object>
-						</child>
-						<child>
-							<object class="GtkStack" id="res_stack">
-								<property name="visible">True</property>
-							</object>
-							<packing>
-								<property name="fill">True</property>
-								<property name="expand">True</property>
-							</packing>
-						</child>
-					</object>
-				</child>
-				<child>
-					<object class="GtkScrolledWindow">
-						<property name="visible">True</property>
-						<child>
-							<object class="GtkGrid" id="map_grid">
-								<property name="visible">True</property>
+								<property name="label">Ground</property>
 							</object>
 						</child>
 					</object>
-					<packing>
-						<property name="fill">True</property>
-						<property name="expand">True</property>
-					</packing>
 				</child>
+				
+				<!-- ENTITY PROPS -->
 				<child>
-					<object class="GtkBox" id="prop_container">
+					<object class="GtkBox" id="entity_props">
 						<property name="visible">True</property>
 						<property name="orientation">vertical</property>
-						<property name="width-request">200</property>
+						<child>
+							<object class="GtkLabel">
+								<property name="visible">True</property>
+								<property name="label">Entity</property>
+							</object>
+						</child>
 					</object>
 				</child>
-			</object>		
+				
+				<!-- CREATURE PROPS -->
+				<child>
+					<object class="GtkBox" id="creature_props">
+						<property name="visible">True</property>
+						<property name="orientation">vertical</property>
+						<child>
+							<object class="GtkLabel">
+								<property name="visible">True</property>
+								<property name="label">Creature</property>
+							</object>
+						</child>
+					</object>
+				</child>
+				
+				<!-- CELL PROPS -->
+				<child>
+					<object class="GtkBox" id="cell_props">
+						<property name="visible">True</property>
+						<property name="orientation">vertical</property>
+						<child>
+							<object class="GtkLabel">
+								<property name="visible">True</property>
+								<property name="label">Cell</property>
+							</object>
+						</child>
+					</object>
+				</child>
+			</object>
 		</child>
 	</template>
 </interface>

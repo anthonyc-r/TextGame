@@ -20,9 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <gtk/gtk.h>
 
+#include "app.h"
+
 #define EDITOR_PROPERTIES_VIEW_TYPE (editor_properties_view_get_type ())
 G_DECLARE_FINAL_TYPE(EditorPropertiesView, editor_properties_view, EDITOR, PROPERTIES_VIEW, GtkApplicationWindow);
 
 EditorPropertiesView *editor_properties_view_new();
+void editor_properties_view_set_item(EditorPropertiesView *view, enum active_item_type type, void *item);
 
 #endif

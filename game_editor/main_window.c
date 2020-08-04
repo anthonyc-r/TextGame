@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "main_window.h"
 #include "headerbar.h"
 #include "game_data.h"
+#include "properties_view.h"
 
 #define ADD_TREE(P, STACK, ID, MODEL) \
 	P = GTK_TREE_VIEW(gtk_tree_view_new_with_model(MODEL)); \
@@ -32,12 +33,15 @@ struct _EditorMainWindow
 {
 	GtkApplicationWindow parent;
 	
+	EditorPropertiesView *prop_view;
+	
 	GtkGrid *map_grid;
 	GtkComboBoxText *res_combo;
 	GtkStack *res_stack;
 	GtkTreeView *grounds_tree;
 	GtkTreeView *ent_tree;
 	GtkTreeView *creat_tree;
+	GtkBox *prop_container;
 };
 
 G_DEFINE_TYPE(EditorMainWindow, editor_main_window, GTK_TYPE_APPLICATION_WINDOW);
@@ -46,11 +50,21 @@ struct point {
 	int x, y;
 };
 
+
+static void
+set_active_item(EditorMainWindow *window, enum active_item_type active_item_type, void *item)
+{
+	g_debug("updated active item");
+	editor_properties_view_set_item(window->prop_view, active_item_type, item);
+}
+
 static void
 grid_button_clicked(GtkButton *button, gpointer user_data)
 {
+	// TODO: - somehow get a handle to the window...
+	EditorMainWindow *window = EDITOR_MAIN_WINDOW(user_data);
 	struct cell *cell = (struct cell*)user_data;
-	editor_app_set_active_item(current_app, ACTIVE_ITEM_CELL, (void*)cell);
+	set_active_item(window, ACTIVE_ITEM_CELL, (void*)cell);
 }
 
 static void
@@ -91,11 +105,11 @@ tree_view_row_activated(GtkTreeView *tree_view, gpointer user_data)
 	gtk_tree_path_free(path);
 
 	if (tree_view == window->grounds_tree) {
-		editor_app_set_active_item(current_app, ACTIVE_ITEM_GROUND, item);
+		set_active_item(window, ACTIVE_ITEM_GROUND, item);
 	} else if (tree_view == window->ent_tree) {
-		editor_app_set_active_item(current_app, ACTIVE_ITEM_ENTITY, item);
+		set_active_item(window, ACTIVE_ITEM_ENTITY, item);
 	} else if (tree_view == window->creat_tree) {
-		editor_app_set_active_item(current_app, ACTIVE_ITEM_CREATURE, item);
+		set_active_item(window, ACTIVE_ITEM_CREATURE, item);
 	}
 }
 
@@ -142,6 +156,10 @@ editor_main_window_init(EditorMainWindow *window)
 	gtk_combo_box_set_active(GTK_COMBO_BOX(window->res_combo), 0);
 	// map
 	setup_map_grid(window->map_grid, editor_app_get_map(current_app));
+	// insert properties view
+	window->prop_view = editor_properties_view_new();
+	gtk_box_pack_start(window->prop_container, GTK_WIDGET(window->prop_view), TRUE, TRUE, 0);
+	gtk_widget_show(GTK_WIDGET(window->prop_view));
 }
 
 static void
@@ -151,6 +169,7 @@ editor_main_window_class_init(EditorMainWindowClass *class)
 	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorMainWindow, res_combo);
 	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorMainWindow, res_stack);
 	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorMainWindow, map_grid);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorMainWindow, prop_container);
 	gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), res_combo_changed);
 }
 

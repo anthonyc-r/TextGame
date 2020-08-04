@@ -20,6 +20,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <gtk/gtk.h>
 
+#include "app.h"
+
+enum active_item_type {
+	ACTIVE_ITEM_NONE,
+	ACTIVE_ITEM_GROUND,
+	ACTIVE_ITEM_CREATURE,
+	ACTIVE_ITEM_ENTITY,
+	ACTIVE_ITEM_CELL
+};
+
+
 #define GROUND_RES_ID "ground_res_id"
 #define ENTITY_RES_ID "entity_res_id"
 #define CREATURE_RES_ID "creature_res_id"
