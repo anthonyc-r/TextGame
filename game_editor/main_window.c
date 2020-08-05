@@ -61,14 +61,15 @@ set_active_item(EditorMainWindow *window, enum active_item_type active_item_type
 static void
 grid_button_clicked(GtkButton *button, gpointer user_data)
 {
-	// TODO: - somehow get a handle to the window...
-	EditorMainWindow *window = EDITOR_MAIN_WINDOW(user_data);
-	struct cell *cell = (struct cell*)user_data;
+	void **data = (void**)user_data;
+	// see setup_map_grid, g_signal_connect_data.
+	struct cell *cell = (struct cell*)data[0];
+	EditorMainWindow *window = EDITOR_MAIN_WINDOW(data[1]);
 	set_active_item(window, ACTIVE_ITEM_CELL, (void*)cell);
 }
 
 static void
-setup_map_grid(GtkGrid *map_grid, struct map *map)
+setup_map_grid(EditorMainWindow *window, GtkGrid *map_grid, struct map *map)
 {
 	g_debug("set up map grid!");
 	for (int i = 0; i < map->width; i++) {
@@ -79,9 +80,13 @@ setup_map_grid(GtkGrid *map_grid, struct map *map)
 	}
 	for (int y = 0; y < map->height; y++) {
 		for (int x = 0; x < map->width; x++) {
+			struct cell *cell = map_get_cell(map, x, y);
+			void **userdata = malloc(2 * sizeof (void*));
+			userdata[0] = cell;
+			userdata[1] = window;
 			GtkWidget *btn = gtk_button_new_with_label("X");
 			gtk_grid_attach(map_grid, btn, x, y, 1, 1);
-			g_signal_connect(G_OBJECT(btn), "clicked", G_CALLBACK(grid_button_clicked), map_get_cell(map, x, y));
+			g_signal_connect_data(G_OBJECT(btn), "clicked", G_CALLBACK(grid_button_clicked), userdata, (GClosureNotify)free, 0);
 			gtk_widget_show(btn);
 		}
 	}
@@ -155,7 +160,7 @@ editor_main_window_init(EditorMainWindow *window)
 	g_signal_connect(G_OBJECT(window->ent_tree), "cursor-changed", G_CALLBACK(tree_view_row_activated), window);
 	gtk_combo_box_set_active(GTK_COMBO_BOX(window->res_combo), 0);
 	// map
-	setup_map_grid(window->map_grid, editor_app_get_map(current_app));
+	setup_map_grid(window, window->map_grid, editor_app_get_map(current_app));
 	// insert properties view
 	window->prop_view = editor_properties_view_new();
 	gtk_box_pack_start(window->prop_container, GTK_WIDGET(window->prop_view), TRUE, TRUE, 0);
