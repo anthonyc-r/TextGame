@@ -73,4 +73,8 @@ struct cell *map_get_cell(struct map *map, int x, int y);
 void save_game_data(char *outpath, struct entity **entities, struct ground **grounds, struct creature **creatures);
 // Allocates memory
 void load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, struct creature ***cdest);
+
+// UTIL
+
+char *size_type_str(enum size_type type);
 #endif

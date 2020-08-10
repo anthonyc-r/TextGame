@@ -64,7 +64,7 @@ new_creature(char *name, char *desc, int health, int tp, int inventory_size)
 
 
 char *
-sizestr(enum size_type type)
+size_type_str(enum size_type type)
 {
 	switch (type) {
 		case SIZE_HUGE:
@@ -89,7 +89,7 @@ save_game_data(char *outpath, struct entity **entities, struct ground **grounds,
 			ent->name,
 			ent->icon,
 			ent->weight,
-			sizestr(ent->size_class));
+			size_type_str(ent->size_class));
 		entities++;
 	}
 	fprintf(file, "\t\n");

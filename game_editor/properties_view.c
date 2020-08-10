@@ -15,10 +15,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define MAX_NUM_LEN 10
+#define MAX_CELL_POS_LEN 20
+
 #include <gtk/gtk.h>
 
 #include "main_window.h"
 #include "properties_view.h"
+#include "game_data.h"
 
 
 struct _EditorPropertiesView
@@ -30,9 +34,107 @@ struct _EditorPropertiesView
 	GtkWidget *cell_props;
 	GtkWidget *entity_props;
 	GtkStack *stack;
+	GtkEntry *ground_name_entry;
+	GtkEntry *ground_icon_entry;
+	GtkEntry *entity_name_entry;
+	GtkEntry *entity_desc_entry;
+	GtkEntry *entity_icon_entry;
+	GtkEntry *entity_weight_entry;
+	GtkEntry *entity_size_class_entry;
+	GtkEntry *creature_name_entry;
+	GtkEntry *creature_desc_entry;
+	GtkEntry *creature_health_entry;
+	GtkEntry *creature_tp_entry;
+	GtkEntry *creature_inventory_size_entry;
+	GtkLabel *cell_position_label;
+	GtkComboBox *cell_ground_combo;
+	GtkComboBox *cell_creature_combo;
+	GtkComboBox *cell_entity_combo;
+	
 };
 
 G_DEFINE_TYPE(EditorPropertiesView, editor_properties_view, GTK_TYPE_BOX);
+
+static void
+fill_ground_fields(EditorPropertiesView *view, struct ground *ground)
+{
+	gtk_entry_set_text(view->ground_name_entry, ground->name);
+	char icon[2] = { ground->icon, '\0' };
+	gtk_entry_set_text(view->ground_icon_entry, icon); 
+}
+
+static void
+fill_entity_fields(EditorPropertiesView *view, struct entity *entity)
+{
+	gtk_entry_set_text(view->entity_name_entry, entity->name);
+	gtk_entry_set_text(view->entity_desc_entry, entity->desc);
+	char icon[2] = { entity->icon, '\0' };
+	gtk_entry_set_text(view->entity_icon_entry, icon);
+	char weight[MAX_NUM_LEN];
+	snprintf(weight, MAX_NUM_LEN, "%d", entity->weight);
+	weight[MAX_NUM_LEN - 1] = '\0';
+	gtk_entry_set_text(view->entity_weight_entry, weight);
+	gtk_entry_set_text(view->entity_size_class_entry, size_type_str(entity->size_class));
+}
+
+static void
+fill_creature_fields(EditorPropertiesView *view, struct creature *creature)
+{
+	gtk_entry_set_text(view->creature_name_entry, creature->name);
+	gtk_entry_set_text(view->creature_desc_entry, creature->desc);
+	char health[MAX_NUM_LEN];
+	snprintf(health, MAX_NUM_LEN, "%d", creature->health);
+	health[MAX_NUM_LEN - 1] = '\0';
+	gtk_entry_set_text(view->creature_health_entry, health);
+	char tp[MAX_NUM_LEN];
+	snprintf(tp, MAX_NUM_LEN, "%d", creature->tp);
+	tp[MAX_NUM_LEN - 1] = '\0';
+	gtk_entry_set_text(view->creature_tp_entry, tp);
+	char invsz[MAX_NUM_LEN];
+	snprintf(invsz, MAX_NUM_LEN, "%d", creature->inventory_size);
+	invsz[MAX_NUM_LEN - 1] = '\0';
+	gtk_entry_set_text(view->creature_inventory_size_entry, invsz);
+}
+
+static int
+find_matching_ptr(GtkTreeModel *model, void *needle)
+{
+	GtkTreeIter iter;
+	void *value;
+	int count = 0;
+	int index = -1;
+	if (gtk_tree_model_get_iter_first(model, &iter)) {
+		do {
+			gtk_tree_model_get(model, &iter, 1, &value, -1);
+			if (needle == value) {
+				index = count;
+				break;
+			}
+			count++;
+		} while (gtk_tree_model_iter_next(model, &iter));
+	}
+	return index;
+}
+
+static void
+fill_cell_fields(EditorPropertiesView *view, struct cell *cell)
+{
+	char position[MAX_CELL_POS_LEN];
+	snprintf(position, MAX_CELL_POS_LEN, "(%d, %d)", cell->x, cell->y);
+	position[MAX_CELL_POS_LEN - 1] = '\0';
+	gtk_label_set_text(view->cell_position_label, position);
+	gtk_combo_box_set_model(view->cell_ground_combo, editor_app_get_ground_tree_model(current_app));
+	gtk_combo_box_set_model(view->cell_entity_combo, editor_app_get_entity_tree_model(current_app));
+	gtk_combo_box_set_model(view->cell_creature_combo, editor_app_get_creature_tree_model(current_app));
+	
+	int index = find_matching_ptr(editor_app_get_ground_tree_model(current_app), cell->ground);
+	gtk_combo_box_set_active(view->cell_ground_combo, index);
+	index = find_matching_ptr(editor_app_get_creature_tree_model(current_app), cell->creature);
+	gtk_combo_box_set_active(view->cell_creature_combo, index);
+	// TODO: - make into a list...
+	index = find_matching_ptr(editor_app_get_entity_tree_model(current_app), cell->entities);
+	gtk_combo_box_set_active(view->cell_entity_combo, index);
+}
 
 static void
 editor_properties_view_init(EditorPropertiesView *view)
@@ -49,6 +151,26 @@ editor_properties_view_class_init(EditorPropertiesViewClass *class)
 	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, cell_props);
 	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, entity_props);
 	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, stack);
+	
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, ground_name_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, ground_icon_entry);
+	
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, entity_name_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, entity_desc_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, entity_icon_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, entity_weight_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, entity_size_class_entry);
+	
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, creature_name_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, creature_desc_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, creature_health_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, creature_tp_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, creature_inventory_size_entry);
+	
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, cell_creature_combo);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, cell_ground_combo);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, cell_entity_combo);
+gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, cell_position_label);
 }
 
 EditorPropertiesView *
@@ -62,15 +184,19 @@ editor_properties_view_set_item(EditorPropertiesView *view, enum active_item_typ
 {
 	switch (type) {
 		case ACTIVE_ITEM_GROUND:
+			fill_ground_fields(view, (struct ground*)item);
 			gtk_stack_set_visible_child(view->stack, view->ground_props);
 			break;
 		case ACTIVE_ITEM_CELL:
+			fill_cell_fields(view, (struct cell*)item);
 			gtk_stack_set_visible_child(view->stack, view->cell_props);
 			break;
 		case ACTIVE_ITEM_ENTITY:
+			fill_entity_fields(view, (struct entity*)item);
 			gtk_stack_set_visible_child(view->stack, view->entity_props);
 			break;
 		case ACTIVE_ITEM_CREATURE:
+			fill_creature_fields(view, (struct creature*)item);
 			gtk_stack_set_visible_child(view->stack, view->creature_props);
 			break;
 	}
