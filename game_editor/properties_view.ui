@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <property name="margin_left">5</property>
     <property name="margin_right">5</property>
     <property name="orientation">vertical</property>
+    <property name="spacing">5</property>
     <child>
       <object class="GtkLabel">
         <property name="visible">True</property>
@@ -78,7 +79,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <child>
                   <object class="GtkEntry" id="ground_name_entry">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can_focus">True</property>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -113,7 +114,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <child>
                   <object class="GtkEntry" id="ground_icon_entry">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can_focus">True</property>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -701,6 +702,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <property name="expand">False</property>
         <property name="fill">True</property>
         <property name="position">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkButton" id="apply_button">
+        <property name="label" translatable="yes">Apply</property>
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="receives_default">True</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">2</property>
       </packing>
     </child>
   </template>

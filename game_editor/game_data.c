@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "game_data.h"
 
 static inline void 
-cpyname(char *dst, char *src, int max)
+cpyname(char *dst, const char *src, int max)
 {
 	strncpy(dst, src, max);
 	dst[MAX_NAME - 1] = '\0';
@@ -228,4 +228,15 @@ map_get_cell(struct map *map, int x, int y)
 	return map->cells + (y * map->height + x);
 }
 
+void
+copy_name(char *dest, const char *src)
+{
+	cpyname(dest, src, MAX_NAME);
+}
+
+void
+copy_desc(char *dest, const char *src)
+{
+	cpyname(dest, src, MAX_DESC);
+}
 

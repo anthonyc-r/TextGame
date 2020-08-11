@@ -29,11 +29,13 @@ struct _EditorPropertiesView
 {
 	GtkBox parent;
 	
+	gulong apply_handler;
 	GtkWidget *ground_props;
 	GtkWidget *creature_props;
 	GtkWidget *cell_props;
 	GtkWidget *entity_props;
 	GtkStack *stack;
+	GtkButton *apply_button;
 	GtkEntry *ground_name_entry;
 	GtkEntry *ground_icon_entry;
 	GtkEntry *entity_name_entry;
@@ -137,40 +139,99 @@ fill_cell_fields(EditorPropertiesView *view, struct cell *cell)
 }
 
 static void
+apply_ground_changes(GtkButton *button, void **userdata)
+{
+	g_debug("apply ground changes");
+	EditorPropertiesView *view = (EditorPropertiesView*)userdata[0];
+	struct ground *ground = (struct ground*)userdata[1];
+	int status = editor_app_update_ground(current_app, ground,
+		gtk_entry_get_text(view->ground_name_entry),
+		gtk_entry_get_text(view->ground_icon_entry)[0]);
+	if (!status)
+		g_debug("invalid ground fields");
+	else
+		g_debug("updated ground");
+	fill_ground_fields(view, ground);
+}
+
+static void
+apply_entity_changes(GtkButton *button, void *userdata)
+{
+	g_debug("apply entity changes");
+}
+
+static void
+apply_creature_changes(GtkButton *button, void *userdata)
+{
+	g_debug("apply creature changes");
+}
+
+static void
+apply_cell_changes(GtkButton *button, void *userdata)
+{
+	g_debug("apply cell changes");
+}
+
+
+static void
 editor_properties_view_init(EditorPropertiesView *view)
 {
 	gtk_widget_init_template(GTK_WIDGET(view));
+	view->apply_handler = 0;
 }
 
 static void
 editor_properties_view_class_init(EditorPropertiesViewClass *class)
 {
 	gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/rocks/colourful/textgame/properties_view.ui");
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, ground_props);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, creature_props);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, cell_props);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, entity_props);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, stack);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		ground_props);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		creature_props);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,	
+		cell_props);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		entity_props);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		stack);
 	
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, ground_name_entry);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, ground_icon_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		ground_name_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		ground_icon_entry);
 	
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, entity_name_entry);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, entity_desc_entry);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, entity_icon_entry);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, entity_weight_entry);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, entity_size_class_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		entity_name_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		entity_desc_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		entity_icon_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		entity_weight_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		entity_size_class_entry);
 	
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, creature_name_entry);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, creature_desc_entry);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, creature_health_entry);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, creature_tp_entry);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, creature_inventory_size_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		creature_name_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		creature_desc_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		creature_health_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		creature_tp_entry);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		creature_inventory_size_entry);
 	
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, cell_creature_combo);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, cell_ground_combo);
-	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, cell_entity_combo);
-gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView, cell_position_label);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		cell_creature_combo);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		cell_ground_combo);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		cell_entity_combo);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		cell_position_label);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorPropertiesView,
+		apply_button);
 }
 
 EditorPropertiesView *
@@ -182,22 +243,36 @@ editor_properties_view_new()
 void
 editor_properties_view_set_item(EditorPropertiesView *view, enum active_item_type type, void *item)
 {
+	if (view->apply_handler > 0) {
+		g_signal_handler_disconnect(view->apply_button, view->apply_handler);
+		view->apply_handler = 0;
+	}
+	void **userdata = malloc(2 * sizeof(void*));
+	userdata[0] = view;
+	userdata[1] = item;
+	GCallback cb = NULL;
 	switch (type) {
 		case ACTIVE_ITEM_GROUND:
+			cb = G_CALLBACK(apply_ground_changes);
 			fill_ground_fields(view, (struct ground*)item);
 			gtk_stack_set_visible_child(view->stack, view->ground_props);
 			break;
 		case ACTIVE_ITEM_CELL:
+			cb = G_CALLBACK(apply_cell_changes);
 			fill_cell_fields(view, (struct cell*)item);
 			gtk_stack_set_visible_child(view->stack, view->cell_props);
 			break;
 		case ACTIVE_ITEM_ENTITY:
+			cb = G_CALLBACK(apply_entity_changes);
 			fill_entity_fields(view, (struct entity*)item);
 			gtk_stack_set_visible_child(view->stack, view->entity_props);
 			break;
 		case ACTIVE_ITEM_CREATURE:
+			cb = G_CALLBACK(apply_creature_changes);
 			fill_creature_fields(view, (struct creature*)item);
 			gtk_stack_set_visible_child(view->stack, view->creature_props);
 			break;
 	}
+	view->apply_handler = g_signal_connect_data(G_OBJECT(view->apply_button), "clicked", 
+				cb, userdata, (GClosureNotify)free, 0);
 }

@@ -86,7 +86,9 @@ setup_map_grid(EditorMainWindow *window, GtkGrid *map_grid, struct map *map)
 			userdata[1] = window;
 			GtkWidget *btn = gtk_button_new_with_label("X");
 			gtk_grid_attach(map_grid, btn, x, y, 1, 1);
-			g_signal_connect_data(G_OBJECT(btn), "clicked", G_CALLBACK(grid_button_clicked), userdata, (GClosureNotify)free, 0);
+			g_signal_connect_data(G_OBJECT(btn), "clicked",
+				G_CALLBACK(grid_button_clicked), userdata, 
+				(GClosureNotify)free, 0);
 			gtk_widget_show(btn);
 		}
 	}

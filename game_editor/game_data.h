@@ -77,4 +77,6 @@ void load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest
 // UTIL
 
 char *size_type_str(enum size_type type);
+void copy_name(char *dest, const char *src);
+void copy_desc(char *dest, const char *src);
 #endif

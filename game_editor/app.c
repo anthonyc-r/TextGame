@@ -276,3 +276,15 @@ editor_app_get_map(EditorApp *app)
 {
 	return app->map;
 }
+
+int 
+editor_app_update_ground(EditorApp *app, struct ground *ground, const char *name, const char icon)
+{
+	if (name[0] != '\0' && icon != '\0') {
+		copy_name(ground->name, name);
+		ground->icon = icon;
+		return 1;
+	} else {
+		return 0;
+	}
+}

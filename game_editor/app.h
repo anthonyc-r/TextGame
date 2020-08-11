@@ -39,5 +39,8 @@ void editor_app_add_ground(EditorApp *app, struct ground *ground);
 void editor_app_add_creature(EditorApp *app, struct creature *creature);
 void editor_app_add_entity(EditorApp *app, struct entity *entity);
 struct map *editor_app_get_map(EditorApp *app);
+
+int editor_app_update_ground(EditorApp *app, struct ground *ground, const char *name, const char icon);
+int editor_app_update_entity(EditorApp *app, struct entity *entity, const char *name, const char *desc, const char icon, int weight, enum size_type size_type);
 #endif
 
