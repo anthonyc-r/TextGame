@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 struct ground;
 struct creature;
 struct entity;
+enum size_type;
 
 #define EDITOR_APP_TYPE (editor_app_get_type ())
 G_DECLARE_FINAL_TYPE(EditorApp, editor_app, EDITOR, APP,  GtkApplication)
@@ -42,5 +43,7 @@ struct map *editor_app_get_map(EditorApp *app);
 
 int editor_app_update_ground(EditorApp *app, struct ground *ground, const char *name, const char icon);
 int editor_app_update_entity(EditorApp *app, struct entity *entity, const char *name, const char *desc, const char icon, int weight, enum size_type size_type);
+int editor_app_update_creature(EditorApp *app, struct creature *creature, const char *name, const char *desc, int health, int tp, int inventory_size);
+int editor_app_update_cell(EditorApp *app, struct cell *cell, struct entity *entity, struct creature *creature, struct ground *ground);
 #endif
 

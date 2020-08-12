@@ -18,11 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _ENTITY_H
 #define _ENTITY_H
 
-#define MAX_NAME 10
+#define MAX_NAME 20
 #define MAX_DESC 100
 #define MAX_LINE 200
 
 enum size_type {
+	SIZE_NONE,
 	SIZE_TINY,
 	SIZE_SMALL,
 	SIZE_LARGE,
@@ -75,7 +76,7 @@ void save_game_data(char *outpath, struct entity **entities, struct ground **gro
 void load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, struct creature ***cdest);
 
 // UTIL
-
+enum size_type entity_size(const char *string);
 char *size_type_str(enum size_type type);
 void copy_name(char *dest, const char *src);
 void copy_desc(char *dest, const char *src);

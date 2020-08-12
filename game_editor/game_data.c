@@ -25,7 +25,7 @@ static inline void
 cpyname(char *dst, const char *src, int max)
 {
 	strncpy(dst, src, max);
-	dst[MAX_NAME - 1] = '\0';
+	dst[max - 1] = '\0';
 }
 
 struct entity *
@@ -75,6 +75,8 @@ size_type_str(enum size_type type)
 			return "SIZE_SMALL";
 		case SIZE_TINY:
 			return "SIZE_TINY";
+		case SIZE_NONE:
+			return "SIZE_NONE";
 	}
 }
 void 
@@ -115,19 +117,18 @@ save_game_data(char *outpath, struct entity **entities, struct ground **grounds,
 }
 
 enum size_type 
-entity_size(char *string)
+entity_size(const char *string)
 {
-	int len = strlen(string);
-	if (strncmp(string, "SIZE_HUGE", len) == 0) {
+	if (strncmp(string, "SIZE_HUGE", 9) == 0) {
 		return SIZE_HUGE;
-	} else if (strncmp(string, "SIZE_LARGE", len) == 0) {
+	} else if (strncmp(string, "SIZE_LARGE", 10) == 0) {
 		return SIZE_LARGE;
-	} else if (strncmp(string, "SIZE_SMALL", len) == 0) {
+	} else if (strncmp(string, "SIZE_SMALL", 10) == 0) {
 		return SIZE_SMALL;
-	} else if (strncmp(string, "SIZE_TINY", len) == 0) {
+	} else if (strncmp(string, "SIZE_TINY", 9) == 0) {
 		return SIZE_TINY;
 	} else {
-		return SIZE_TINY;
+		return SIZE_NONE;
 	}
 }
 void 

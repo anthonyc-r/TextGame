@@ -36,6 +36,24 @@ struct _EditorApp
 
 G_DEFINE_TYPE(EditorApp, editor_app, GTK_TYPE_APPLICATION);
 
+static int
+iter_to_match(GtkListStore *list, void *needle, GtkTreeIter *res)
+{
+	GtkTreeModel *model = GTK_TREE_MODEL(list);
+	GtkTreeIter iter;
+	void *value;
+	if (gtk_tree_model_get_iter_first(model, &iter)) {
+		do {
+			gtk_tree_model_get(model, &iter, 1, &value, -1);
+			if (needle == value) {
+				*res = iter;
+				return 1;
+			}
+		} while (gtk_tree_model_iter_next(model, &iter));
+	}
+	return 0;
+}
+
 static void
 editor_app_activate(GApplication *app)
 {
@@ -283,8 +301,62 @@ editor_app_update_ground(EditorApp *app, struct ground *ground, const char *name
 	if (name[0] != '\0' && icon != '\0') {
 		copy_name(ground->name, name);
 		ground->icon = icon;
+		GtkTreeIter iter;
+		if (iter_to_match(app->ground_types, ground, &iter)) {
+			gtk_list_store_set(app->ground_types, &iter, 0, 
+				ground->name, -1); 
+		}
 		return 1;
 	} else {
 		return 0;
 	}
+}
+
+int 
+editor_app_update_entity(EditorApp *app, struct entity *entity, const char *name, const char *desc, const char icon, int weight, enum size_type size_type)
+{
+	int valid = name[0] != '\0' && desc[0] != '\0' && icon != '\0' 
+		&& size_type != SIZE_NONE;
+	if (valid) {
+		copy_name(entity->name, name);
+		copy_desc(entity->desc, desc);
+		entity->icon = icon;
+		entity->weight = weight;
+		entity->size_class = size_type;
+		GtkTreeIter iter;
+		if (iter_to_match(app->entity_types, entity, &iter)) {
+			gtk_list_store_set(app->entity_types, &iter, 0,
+				entity->name, -1);
+		}
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+int 
+editor_app_update_creature(EditorApp *app, struct creature *creature, const char *name, const char *desc, int health, int tp, int inventory_size)
+{
+	if (name[0] != '\0' && desc[0] != '\0') {
+		copy_name(creature->name, name);
+		copy_desc(creature->desc, desc);
+		creature->health = health;
+		creature->tp = tp;
+		creature->inventory_size = inventory_size;
+		GtkTreeIter iter;
+		if (iter_to_match(app->creature_types, creature, &iter)) {
+			gtk_list_store_set(app->creature_types, &iter, 0,
+				creature->name, -1);
+		}
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+int 
+editor_app_update_cell(EditorApp *app, struct cell *cell, struct entity *entity, struct creature *creature, struct ground *ground)
+{
+	
+	return 0;
 }

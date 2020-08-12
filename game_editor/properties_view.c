@@ -147,23 +147,64 @@ apply_ground_changes(GtkButton *button, void **userdata)
 	int status = editor_app_update_ground(current_app, ground,
 		gtk_entry_get_text(view->ground_name_entry),
 		gtk_entry_get_text(view->ground_icon_entry)[0]);
-	if (!status)
+	if (!status) {
 		g_debug("invalid ground fields");
-	else
+	} else {
 		g_debug("updated ground");
+	}
 	fill_ground_fields(view, ground);
 }
 
 static void
-apply_entity_changes(GtkButton *button, void *userdata)
+apply_entity_changes(GtkButton *button, void **userdata)
 {
 	g_debug("apply entity changes");
+	EditorPropertiesView *view = (EditorPropertiesView*)userdata[0];
+	struct entity *entity = (struct entity*)userdata[1];
+	
+	int weight = (int)strtol(gtk_entry_get_text(view->entity_weight_entry),
+		NULL, 10);
+	const char *sizestr = gtk_entry_get_text(view->entity_size_class_entry);
+	enum size_type size = entity_size(sizestr);
+	int status = editor_app_update_entity(current_app, entity,
+		gtk_entry_get_text(view->entity_name_entry),
+		gtk_entry_get_text(view->entity_desc_entry),
+		gtk_entry_get_text(view->entity_icon_entry)[0],
+		weight,
+		size);
+	if (!status) {
+		g_debug("changes rejected");
+	} else {
+		g_debug("updated entity");
+	}
+	fill_entity_fields(view, entity);	
 }
 
 static void
-apply_creature_changes(GtkButton *button, void *userdata)
+apply_creature_changes(GtkButton *button, void **userdata)
 {
 	g_debug("apply creature changes");
+	EditorPropertiesView *view = (EditorPropertiesView*)userdata[0];
+	struct creature *creature = (struct creature*)userdata[1];
+	
+	int health = (int)strtol(gtk_entry_get_text(view->creature_health_entry),
+		NULL, 10);
+
+	int tp = (int)strtol(gtk_entry_get_text(view->creature_tp_entry),
+		NULL, 10);
+	int invsz = (int)strtol(
+		gtk_entry_get_text(view->creature_inventory_size_entry), 
+		NULL, 10); 
+	int status = editor_app_update_creature(current_app, creature,
+		gtk_entry_get_text(view->creature_name_entry),
+		gtk_entry_get_text(view->creature_desc_entry),
+		health, tp, invsz);
+	if (!status) {
+		g_debug("rejected changes");
+	} else {
+		g_debug("updated creature");
+	}
+	fill_creature_fields(view, creature);
 }
 
 static void
