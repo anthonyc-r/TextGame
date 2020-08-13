@@ -24,6 +24,7 @@ struct ground;
 struct creature;
 struct entity;
 enum size_type;
+struct cell;
 
 #define EDITOR_APP_TYPE (editor_app_get_type ())
 G_DECLARE_FINAL_TYPE(EditorApp, editor_app, EDITOR, APP,  GtkApplication)

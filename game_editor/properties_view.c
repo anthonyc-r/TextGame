@@ -208,9 +208,38 @@ apply_creature_changes(GtkButton *button, void **userdata)
 }
 
 static void
-apply_cell_changes(GtkButton *button, void *userdata)
+apply_cell_changes(GtkButton *button, void **userdata)
 {
 	g_debug("apply cell changes");
+	EditorPropertiesView *view = (EditorPropertiesView*)userdata[0];
+	struct cell *cell = (struct cell*)userdata[1];
+	
+	struct ground *ground = NULL;
+	struct creature *creature = NULL;
+	struct entity *entity = NULL;
+	GtkTreeModel *model = gtk_combo_box_get_model(view->cell_ground_combo);
+	GtkTreeIter iter;
+	if (gtk_combo_box_get_active(view->cell_ground_combo) >= 0) {
+		gtk_combo_box_get_active_iter(view->cell_ground_combo, &iter);
+		gtk_tree_model_get(model, &iter, 1, (void*)&ground, -1);
+	}
+	model = gtk_combo_box_get_model(view->cell_creature_combo);
+	if (gtk_combo_box_get_active(view->cell_creature_combo) >= 0) {
+		gtk_combo_box_get_active_iter(view->cell_creature_combo, &iter);
+		gtk_tree_model_get(model, &iter, 1, (void*)&creature, -1);
+	}
+	model = gtk_combo_box_get_model(view->cell_entity_combo);
+	if (gtk_combo_box_get_active(view->cell_entity_combo) >= 0) {
+		gtk_combo_box_get_active_iter(view->cell_entity_combo, &iter);
+		gtk_tree_model_get(model, &iter, 1, (void*)&entity, -1);
+	}
+	int status = editor_app_update_cell(current_app, cell, entity, creature,
+		ground);
+	if (!status) {
+		g_debug("rejected changes");
+	} else {
+		g_debug("cell updated");
+	}
 }
 
 

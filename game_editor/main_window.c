@@ -84,7 +84,7 @@ setup_map_grid(EditorMainWindow *window, GtkGrid *map_grid, struct map *map)
 			void **userdata = malloc(2 * sizeof (void*));
 			userdata[0] = cell;
 			userdata[1] = window;
-			GtkWidget *btn = gtk_button_new_with_label("X");
+			GtkWidget *btn = gtk_button_new_with_label("");
 			gtk_grid_attach(map_grid, btn, x, y, 1, 1);
 			g_signal_connect_data(G_OBJECT(btn), "clicked",
 				G_CALLBACK(grid_button_clicked), userdata, 
@@ -184,5 +184,29 @@ EditorMainWindow *
 editor_main_window_new(EditorApp *app)
 {
 	return g_object_new(EDITOR_MAIN_WINDOW_TYPE, "application", app, "title", "Game Editor", NULL);
+}
+
+void 
+editor_main_window_update_cell(EditorMainWindow *window, struct map *map, int x, int y)
+{
+	g_debug("update grid at %d, %d", x, y);
+	struct cell *cell = map_get_cell(map, x, y);
+	GtkWidget *widget = gtk_grid_get_child_at(window->map_grid, x, y);
+	char text[6];
+	int i = 0;
+	if (cell->ground != NULL) {
+		text[i++] = cell->ground->icon;
+	}
+	if (cell->entities != NULL) {
+		text[i++] = cell->entities->icon;
+	}
+	if (cell->creature != NULL) {
+		text[i++] = '(';
+		text[i++] = cell->creature->name[0];
+		text[i++] = ')';
+	}
+	text[i] = '\0';
+	g_debug("setting text to [%s]", text);
+	gtk_button_set_label(GTK_BUTTON(widget), text);
 }
 

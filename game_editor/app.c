@@ -357,6 +357,10 @@ editor_app_update_creature(EditorApp *app, struct creature *creature, const char
 int 
 editor_app_update_cell(EditorApp *app, struct cell *cell, struct entity *entity, struct creature *creature, struct ground *ground)
 {
-	
-	return 0;
+	cell->entities = entity;
+	cell->creature = creature;
+	cell->ground = ground;
+	editor_main_window_update_cell(app->main_window, app->map, cell->x, 
+		cell->y);
+	return 1;
 }

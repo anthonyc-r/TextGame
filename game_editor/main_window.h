@@ -39,5 +39,6 @@ enum active_item_type {
 G_DECLARE_FINAL_TYPE(EditorMainWindow, editor_main_window, EDITOR, MAIN_WINDOW, GtkApplicationWindow);
 
 EditorMainWindow *editor_main_window_new(EditorApp *app);
+void editor_main_window_update_cell(EditorMainWindow *window, struct map *map, int x, int y);
 
 #endif
