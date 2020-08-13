@@ -241,3 +241,29 @@ copy_desc(char *dest, const char *src)
 	cpyname(dest, src, MAX_DESC);
 }
 
+struct map *
+load_old_map_data(char *inpath, struct ground **grounds, struct entity **entities, struct creature **creatures)
+{
+	int width, height;
+	char buf[255];
+	FILE *file = fopen(inpath, "r");
+	fgets(buf, 255, file);
+	fgets(buf, 255, file);
+	int delim = -1;
+	while (buf[++delim] != ' ')
+		;
+	buf[delim] = '\0';
+	width = (int)strtol(buf, NULL, 10);
+	height = (int)strtol(buf + delim + 1, NULL, 10);
+	printf("loading map width, %d, height %d\n", width, height);
+	fgets(buf, 255, file);
+	char groundi, entityi, creaturei;
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {
+			groundi = fgetc(file);
+			entityi = fgetc(file);
+			creaturei = fgetc(file);
+		}
+	}
+}
+

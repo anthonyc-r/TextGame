@@ -74,6 +74,8 @@ struct cell *map_get_cell(struct map *map, int x, int y);
 void save_game_data(char *outpath, struct entity **entities, struct ground **grounds, struct creature **creatures);
 // Allocates memory
 void load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, struct creature ***cdest);
+// Allocates memory, map needs destroying after...
+struct map *load_old_map_data(char *inpath, struct ground **grounds, struct entity **entities, struct creature **creatures);
 
 // UTIL
 enum size_type entity_size(const char *string);

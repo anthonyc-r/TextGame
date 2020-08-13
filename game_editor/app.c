@@ -30,6 +30,10 @@ struct _EditorApp
 	GtkListStore *ground_types;
 	GtkListStore *entity_types;
 	GtkListStore *creature_types;
+	// todo:- remove when old separate map&dat are replaced
+	struct entity **entities_array;
+	struct creature **creatures_array;
+	struct ground **grounds_array;
 	struct map *map;
 };
 
@@ -186,6 +190,9 @@ load_game_activated(GSimpleAction *action, GVariant *param, gpointer p)
 	char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 	gtk_widget_destroy(dialog);
 	load_game_data(filename, &entities, &grounds, &creatures);
+	current_app->grounds_array = grounds;
+	current_app->creatures_array = creatures;
+	current_app->entities_array = entities;
 	g_debug("game data loaded");
 	free(filename);
 	while (*grounds != NULL) {
@@ -202,12 +209,35 @@ load_game_activated(GSimpleAction *action, GVariant *param, gpointer p)
 	}
 }
 
+static void
+load_map_activated(GSimpleAction *action, GVariant *param, gpointer p)
+{
+	g_debug("tapped load map");
+	GtkWidget *dialog = gtk_file_chooser_dialog_new(
+		"Load Game Data",
+		GTK_WINDOW(current_app->main_window), 
+		GTK_FILE_CHOOSER_ACTION_OPEN,
+		"Cancel", GTK_RESPONSE_CANCEL,
+		"Load", GTK_RESPONSE_ACCEPT, NULL);
+	int result = gtk_dialog_run(GTK_DIALOG(dialog));
+	if (result != GTK_RESPONSE_ACCEPT) {
+		gtk_widget_destroy(dialog);
+		return;
+	}
+	char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+	gtk_widget_destroy(dialog);
+	load_old_map_data(filename, current_app->grounds_array, 
+		current_app->entities_array, current_app->creatures_array);
+	free(filename);
+}
+
 static GActionEntry editor_app_entries[] = 
 {
 	{"quit", quit_activated, NULL, NULL, NULL },
 	{"load_game", load_game_activated, NULL, NULL, NULL},
 	{"save_game", save_game_activated, NULL, NULL, NULL},
-	{"create_ground", create_ground_activated, NULL, NULL, NULL}
+	{"create_ground", create_ground_activated, NULL, NULL, NULL},
+	{"load_map", load_map_activated, NULL, NULL, NULL }
 };
 
 static void
