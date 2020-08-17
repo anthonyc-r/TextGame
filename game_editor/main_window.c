@@ -42,6 +42,7 @@ struct _EditorMainWindow
 	GtkTreeView *ent_tree;
 	GtkTreeView *creat_tree;
 	GtkBox *prop_container;
+	GtkContainer *map_grid_container;
 };
 
 G_DEFINE_TYPE(EditorMainWindow, editor_main_window, GTK_TYPE_APPLICATION_WINDOW);
@@ -69,6 +70,27 @@ grid_button_clicked(GtkButton *button, gpointer user_data)
 }
 
 static void
+setup_cell_icon(GtkWidget *widget, struct cell *cell)
+{
+	char text[6];
+	int i = 0;
+	if (cell->ground != NULL) {
+		text[i++] = cell->ground->icon;
+	}
+	if (cell->entities != NULL) {
+		text[i++] = cell->entities->icon;
+	}
+	if (cell->creature != NULL) {
+		text[i++] = '(';
+		text[i++] = cell->creature->name[0];
+		text[i++] = ')';
+	}
+	text[i] = '\0';
+	g_debug("setting text to [%s]", text);
+	gtk_button_set_label(GTK_BUTTON(widget), text);
+}
+
+static void
 setup_map_grid(EditorMainWindow *window, GtkGrid *map_grid, struct map *map)
 {
 	g_debug("set up map grid!");
@@ -89,6 +111,7 @@ setup_map_grid(EditorMainWindow *window, GtkGrid *map_grid, struct map *map)
 			g_signal_connect_data(G_OBJECT(btn), "clicked",
 				G_CALLBACK(grid_button_clicked), userdata, 
 				(GClosureNotify)free, 0);
+			setup_cell_icon(btn, cell);
 			gtk_widget_show(btn);
 		}
 	}
@@ -177,6 +200,7 @@ editor_main_window_class_init(EditorMainWindowClass *class)
 	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorMainWindow, res_stack);
 	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorMainWindow, map_grid);
 	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorMainWindow, prop_container);
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorMainWindow, map_grid_container);
 	gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), res_combo_changed);
 }
 
@@ -192,21 +216,19 @@ editor_main_window_update_cell(EditorMainWindow *window, struct map *map, int x,
 	g_debug("update grid at %d, %d", x, y);
 	struct cell *cell = map_get_cell(map, x, y);
 	GtkWidget *widget = gtk_grid_get_child_at(window->map_grid, x, y);
-	char text[6];
-	int i = 0;
-	if (cell->ground != NULL) {
-		text[i++] = cell->ground->icon;
-	}
-	if (cell->entities != NULL) {
-		text[i++] = cell->entities->icon;
-	}
-	if (cell->creature != NULL) {
-		text[i++] = '(';
-		text[i++] = cell->creature->name[0];
-		text[i++] = ')';
-	}
-	text[i] = '\0';
-	g_debug("setting text to [%s]", text);
-	gtk_button_set_label(GTK_BUTTON(widget), text);
+	setup_cell_icon(widget, cell);
+}
+
+void
+editor_main_window_update_map(EditorMainWindow *window)
+{
+	g_debug("updating entire map with new map...");
+	gtk_container_remove(window->map_grid_container, GTK_WIDGET(window->map_grid));
+	gtk_widget_destroy(GTK_WIDGET(window->map_grid));
+	window->map_grid = GTK_GRID(gtk_grid_new());
+	gtk_container_add(window->map_grid_container, GTK_WIDGET(window->map_grid));
+	gtk_widget_show(GTK_WIDGET(window->map_grid));
+	
+	setup_map_grid(window, window->map_grid, editor_app_get_map(current_app));
 }
 

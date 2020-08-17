@@ -226,9 +226,11 @@ load_map_activated(GSimpleAction *action, GVariant *param, gpointer p)
 	}
 	char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 	gtk_widget_destroy(dialog);
-	load_old_map_data(filename, current_app->grounds_array, 
+	current_app->map = load_old_map_data(filename, current_app->grounds_array, 
 		current_app->entities_array, current_app->creatures_array);
 	free(filename);
+	editor_main_window_update_map(current_app->main_window);
+	
 }
 
 static GActionEntry editor_app_entries[] = 

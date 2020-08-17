@@ -256,14 +256,34 @@ load_old_map_data(char *inpath, struct ground **grounds, struct entity **entitie
 	width = (int)strtol(buf, NULL, 10);
 	height = (int)strtol(buf + delim + 1, NULL, 10);
 	printf("loading map width, %d, height %d\n", width, height);
+	struct map *map = new_map(width, height);
 	fgets(buf, 255, file);
 	char groundi, entityi, creaturei;
+	struct creature *creature;
+	struct entity *entity;
+	struct ground *ground;
+	struct cell *cell;
+	int index;
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
-			groundi = fgetc(file);
-			entityi = fgetc(file);
-			creaturei = fgetc(file);
+			cell = map_get_cell(map, x, y);
+			index = (int)fgetc(file);
+			if (index > 0 && index != 255) {
+				printf("load ground %d\n", index);
+				cell->ground = grounds[index];
+			}
+			index = (int)fgetc(file);
+			if (index > 0 && index != 255) {
+				printf("load entity %d\n", index);
+				cell->entities = entities[index];
+			}
+			index = (int)fgetc(file);
+			if (index > 0 && index != 255) {
+				printf("load creature %d\n", index);
+				cell->creature = creatures[index];
+			}
 		}
 	}
+	return map;
 }
 

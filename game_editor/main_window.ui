@@ -55,7 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					</object>
 				</child>
 				<child>
-					<object class="GtkScrolledWindow">
+					<object class="GtkScrolledWindow" id="map_grid_container">
 						<property name="visible">True</property>
 						<child>
 							<object class="GtkGrid" id="map_grid">

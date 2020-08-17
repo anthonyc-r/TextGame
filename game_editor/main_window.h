@@ -40,5 +40,5 @@ G_DECLARE_FINAL_TYPE(EditorMainWindow, editor_main_window, EDITOR, MAIN_WINDOW, 
 
 EditorMainWindow *editor_main_window_new(EditorApp *app);
 void editor_main_window_update_cell(EditorMainWindow *window, struct map *map, int x, int y);
-
+void editor_main_window_update_map(EditorMainWindow *window);
 #endif
