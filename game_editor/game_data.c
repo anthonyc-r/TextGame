@@ -79,10 +79,10 @@ size_type_str(enum size_type type)
 			return "SIZE_NONE";
 	}
 }
-void 
-save_game_data(char *outpath, struct entity **entities, struct ground **grounds, struct creature **creatures)
+
+static void
+save_game_types(FILE *file, struct entity **entities, struct ground **grounds, struct creature **creatures)
 {
-	FILE *file = fopen(outpath, "w+");
 	struct entity *ent;
 	struct creature *creat;
 	struct ground *ground;
@@ -113,6 +113,22 @@ save_game_data(char *outpath, struct entity **entities, struct ground **grounds,
 	}
 	fprintf(file, "\t\n");
 	fprintf(file, "\t\n");
+}
+
+static void
+save_map(FILE *file, struct entity **entities, struct ground **grounds, struct creature **creatures, struct map *map)
+{
+	
+}
+
+void 
+save_game_data(char *outpath, struct entity **entities, struct ground **grounds, struct creature **creatures, struct map *map)
+{
+	FILE *file = fopen(outpath, "w+");
+	save_game_types(file, entities, grounds, creatures);
+	fprintf(file, DAT_SEPARATOR);
+	save_map(file, entities, grounds, creatures, map);
+	fprintf(file, DAT_END);
 	fclose(file);
 }
 
@@ -131,6 +147,8 @@ entity_size(const char *string)
 		return SIZE_NONE;
 	}
 }
+
+
 void 
 load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, struct creature ***cdest)
 {
@@ -195,6 +213,52 @@ load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, str
 }
 
 struct map *
+load_old_map_data(char *inpath, struct ground **grounds, struct entity **entities, struct creature **creatures)
+{
+	int width, height;
+	char buf[255];
+	FILE *file = fopen(inpath, "r");
+	fgets(buf, 255, file);
+	fgets(buf, 255, file);
+	int delim = -1;
+	while (buf[++delim] != ' ')
+		;
+	buf[delim] = '\0';
+	width = (int)strtol(buf, NULL, 10);
+	height = (int)strtol(buf + delim + 1, NULL, 10);
+	printf("loading map width, %d, height %d\n", width, height);
+	struct map *map = new_map(width, height);
+	fgets(buf, 255, file);
+	char groundi, entityi, creaturei;
+	struct creature *creature;
+	struct entity *entity;
+	struct ground *ground;
+	struct cell *cell;
+	int index;
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {
+			cell = map_get_cell(map, x, y);
+			index = (int)fgetc(file);
+			if (index > 0 && index != 255) {
+				printf("load ground %d\n", index);
+				cell->ground = grounds[index];
+			}
+			index = (int)fgetc(file);
+			if (index > 0 && index != 255) {
+				printf("load entity %d\n", index);
+				cell->entities = entities[index];
+			}
+			index = (int)fgetc(file);
+			if (index > 0 && index != 255) {
+				printf("load creature %d\n", index);
+				cell->creature = creatures[index];
+			}
+		}
+	}
+	return map;
+}
+
+struct map *
 new_map(int width, int height) 
 {
 	struct map *map = malloc(sizeof (struct map));
@@ -239,51 +303,5 @@ void
 copy_desc(char *dest, const char *src)
 {
 	cpyname(dest, src, MAX_DESC);
-}
-
-struct map *
-load_old_map_data(char *inpath, struct ground **grounds, struct entity **entities, struct creature **creatures)
-{
-	int width, height;
-	char buf[255];
-	FILE *file = fopen(inpath, "r");
-	fgets(buf, 255, file);
-	fgets(buf, 255, file);
-	int delim = -1;
-	while (buf[++delim] != ' ')
-		;
-	buf[delim] = '\0';
-	width = (int)strtol(buf, NULL, 10);
-	height = (int)strtol(buf + delim + 1, NULL, 10);
-	printf("loading map width, %d, height %d\n", width, height);
-	struct map *map = new_map(width, height);
-	fgets(buf, 255, file);
-	char groundi, entityi, creaturei;
-	struct creature *creature;
-	struct entity *entity;
-	struct ground *ground;
-	struct cell *cell;
-	int index;
-	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < width; x++) {
-			cell = map_get_cell(map, x, y);
-			index = (int)fgetc(file);
-			if (index > 0 && index != 255) {
-				printf("load ground %d\n", index);
-				cell->ground = grounds[index];
-			}
-			index = (int)fgetc(file);
-			if (index > 0 && index != 255) {
-				printf("load entity %d\n", index);
-				cell->entities = entities[index];
-			}
-			index = (int)fgetc(file);
-			if (index > 0 && index != 255) {
-				printf("load creature %d\n", index);
-				cell->creature = creatures[index];
-			}
-		}
-	}
-	return map;
 }
 

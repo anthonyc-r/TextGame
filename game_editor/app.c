@@ -161,7 +161,7 @@ save_game_activated(GSimpleAction *action, GVariant *param, gpointer p)
 	}
 	char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 	gtk_widget_destroy(dialog);
-	save_game_data(filename, entities, grounds, creatures);
+	save_game_data(filename, entities, grounds, creatures, current_app->map);
 	free(filename);
 	free(grounds);
 	free(entities);
