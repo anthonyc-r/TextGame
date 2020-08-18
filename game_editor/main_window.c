@@ -86,7 +86,6 @@ setup_cell_icon(GtkWidget *widget, struct cell *cell)
 		text[i++] = ')';
 	}
 	text[i] = '\0';
-	g_debug("setting text to [%s]", text);
 	gtk_button_set_label(GTK_BUTTON(widget), text);
 }
 

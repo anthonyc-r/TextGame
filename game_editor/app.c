@@ -305,6 +305,10 @@ editor_app_add_ground(EditorApp *app, struct ground *ground)
 	GtkTreeIter iter;
 	gtk_list_store_append(app->ground_types, &iter);
 	gtk_list_store_set(app->ground_types, &iter, 0, ground->name, 1, ground, -1);
+	GtkTreePath *path = gtk_tree_model_get_path(GTK_TREE_MODEL(app->ground_types),
+		&iter);
+	ground->index = gtk_tree_path_get_indices(path)[0];
+	gtk_tree_path_free(path);
 }
 void 
 editor_app_add_creature(EditorApp *app, struct creature *creature)
@@ -312,6 +316,10 @@ editor_app_add_creature(EditorApp *app, struct creature *creature)
 	GtkTreeIter iter;
 	gtk_list_store_append(app->creature_types, &iter);
 	gtk_list_store_set(app->creature_types, &iter, 0, creature->name, 1, creature, -1);
+	GtkTreePath *path = gtk_tree_model_get_path(GTK_TREE_MODEL(app->creature_types),
+		&iter);
+	creature->index = gtk_tree_path_get_indices(path)[0];
+	gtk_tree_path_free(path);
 }
 void 
 editor_app_add_entity(EditorApp *app, struct entity *entity)
@@ -319,6 +327,10 @@ editor_app_add_entity(EditorApp *app, struct entity *entity)
 	GtkTreeIter iter;
 	gtk_list_store_append(app->entity_types, &iter);
 	gtk_list_store_set(app->entity_types, &iter, 0, entity->name, 1, entity, -1);
+	GtkTreePath *path = gtk_tree_model_get_path(GTK_TREE_MODEL(app->entity_types),
+		&iter);
+	entity->index = gtk_tree_path_get_indices(path)[0];
+	gtk_tree_path_free(path);
 }
 
 struct map *

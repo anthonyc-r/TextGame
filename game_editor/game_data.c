@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #include "game_data.h"
 
@@ -94,14 +95,14 @@ save_game_types(FILE *file, struct entity **entities, struct ground **grounds, s
 			size_type_str(ent->size_class));
 		entities++;
 	}
-	fprintf(file, "\t\n");
+	fprintf(file, DAT_TYPES_SEPARATOR);
 	while ((ground = *grounds) != NULL) {
 		fprintf(file, "%s\t%c\n",
 			ground->name,
 			ground->icon);
 		grounds++;
 	}
-	fprintf(file, "\t\n");
+	fprintf(file, DAT_TYPES_SEPARATOR);
 	while ((creat = *creatures) != NULL) {
 		fprintf(file, "%s\t%d\t%d\t%d\t%s\n",
 			creat->name,
@@ -111,14 +112,31 @@ save_game_types(FILE *file, struct entity **entities, struct ground **grounds, s
 			creat->desc);
 		creatures++;
 	}
-	fprintf(file, "\t\n");
-	fprintf(file, "\t\n");
+	fprintf(file, DAT_TYPES_SEPARATOR);
+	fprintf(file, DAT_TYPES_SEPARATOR);
 }
 
 static void
 save_map(FILE *file, struct entity **entities, struct ground **grounds, struct creature **creatures, struct map *map)
 {
-	
+	struct cell *cell;
+	uint32_t index;
+	fwrite(&map->width, sizeof (uint32_t), 1, file);
+	fwrite(&map->height, sizeof (uint32_t), 1, file);
+	for (int y = 0; y < map->height; y++) {
+		for (int x = 0; x < map->width; x++) {
+			cell = map_get_cell(map, x, y);
+			index = (cell->entities != NULL) ? cell->entities->index 
+				: DAT_EMPTY_INDEX;
+			fwrite(&index, sizeof (uint32_t), 1, file);
+			index = (cell->ground != NULL) ? cell->ground->index 
+				: DAT_EMPTY_INDEX;
+			fwrite(&index, sizeof (uint32_t), 1, file);
+			index = (cell->creature != NULL) ? cell->creature->index 
+				: DAT_EMPTY_INDEX;
+			fwrite(&index, sizeof (uint32_t), 1, file);
+		}
+	}
 }
 
 void 
@@ -126,7 +144,7 @@ save_game_data(char *outpath, struct entity **entities, struct ground **grounds,
 {
 	FILE *file = fopen(outpath, "w+");
 	save_game_types(file, entities, grounds, creatures);
-	fprintf(file, DAT_SEPARATOR);
+	fprintf(file, DAT_MAP_SEPARATOR);
 	save_map(file, entities, grounds, creatures, map);
 	fprintf(file, DAT_END);
 	fclose(file);
@@ -149,13 +167,11 @@ entity_size(const char *string)
 }
 
 
-void 
-load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, struct creature ***cdest)
+static void
+load_game_types(FILE *file, struct entity ***edest, struct ground ***gdest, struct creature ***cdest)
 {
 	int ecount, gcount, ccount, scount;
-	char linebuff[MAX_LINE];
-	FILE *file = fopen(inpath, "r");
-	
+	char linebuff[MAX_LINE];	
 	ecount = 0;
 	ccount = 0;
 	gcount = 0;
@@ -209,7 +225,33 @@ load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, str
 	*edest = ents;
 	*gdest = grounds;
 	*cdest = creatures;
+}
+
+static struct map *
+load_game_map(FILE *file)
+{
+	int width, height;
+	fread(&width, sizeof (uint32_t), 1, file);
+	fread(&height, sizeof (uint32_t), 1, file);
+	struct map *map = new_map(width, height);
+	
+	return map;
+}
+
+static void
+seek_to_map_start(FILE *file)
+{
+	// TODO: - separation scheme that is actually usable . . . .
+}
+
+struct map * 
+load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, struct creature ***cdest)
+{
+	FILE *file = fopen(inpath, "r");
+	load_game_types(file, edest, gdest, cdest);
+	struct map *map = load_game_map(file);
 	fclose(file);
+	return map;
 }
 
 struct map *
