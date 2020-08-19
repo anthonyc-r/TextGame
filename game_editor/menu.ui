@@ -30,7 +30,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</item>
 		<item>
 			<attribute name="label" translatable="yes">DLoad Old Map</attribute>
-			<attribute name="action">app.load_map</attribute>
+			<attribute name="action">app.load_old_map</attribute>
+		</item>
+		<item>
+			<attribute name="label" translatable="yes">DLoad Old Dat</attribute>
+			<attribute name="action">app.load_old_dat</attribute>
 		</item>
 		<item>
 			<attribute name="label" translatable="yes">Save Game</attribute>

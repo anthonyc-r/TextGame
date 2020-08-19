@@ -95,14 +95,14 @@ save_game_types(FILE *file, struct entity **entities, struct ground **grounds, s
 			size_type_str(ent->size_class));
 		entities++;
 	}
-	fprintf(file, DAT_TYPES_SEPARATOR);
+	fprintf(file, "\t\n");
 	while ((ground = *grounds) != NULL) {
 		fprintf(file, "%s\t%c\n",
 			ground->name,
 			ground->icon);
 		grounds++;
 	}
-	fprintf(file, DAT_TYPES_SEPARATOR);
+	fprintf(file, "\t\n");
 	while ((creat = *creatures) != NULL) {
 		fprintf(file, "%s\t%d\t%d\t%d\t%s\n",
 			creat->name,
@@ -112,8 +112,9 @@ save_game_types(FILE *file, struct entity **entities, struct ground **grounds, s
 			creat->desc);
 		creatures++;
 	}
-	fprintf(file, DAT_TYPES_SEPARATOR);
-	fprintf(file, DAT_TYPES_SEPARATOR);
+	fprintf(file, "\t\n");
+	// sounds?
+	fprintf(file, "\t\n");
 }
 
 static void
@@ -128,12 +129,15 @@ save_map(FILE *file, struct entity **entities, struct ground **grounds, struct c
 			cell = map_get_cell(map, x, y);
 			index = (cell->entities != NULL) ? cell->entities->index 
 				: DAT_EMPTY_INDEX;
+			printf("index %ud\n", index);
 			fwrite(&index, sizeof (uint32_t), 1, file);
 			index = (cell->ground != NULL) ? cell->ground->index 
 				: DAT_EMPTY_INDEX;
+			printf("index %ud\n", index);
 			fwrite(&index, sizeof (uint32_t), 1, file);
 			index = (cell->creature != NULL) ? cell->creature->index 
 				: DAT_EMPTY_INDEX;
+			printf("index %ud\n", index);
 			fwrite(&index, sizeof (uint32_t), 1, file);
 		}
 	}
@@ -144,9 +148,9 @@ save_game_data(char *outpath, struct entity **entities, struct ground **grounds,
 {
 	FILE *file = fopen(outpath, "w+");
 	save_game_types(file, entities, grounds, creatures);
-	fprintf(file, DAT_MAP_SEPARATOR);
+	fprintf(file, DAT_MAP_SEPARATOR"\n");
 	save_map(file, entities, grounds, creatures, map);
-	fprintf(file, DAT_END);
+	fprintf(file, DAT_END"\n");
 	fclose(file);
 }
 
@@ -221,6 +225,9 @@ load_game_types(FILE *file, struct entity ***edest, struct ground ***gdest, stru
 		creatures[i++] = new_creature(name, "No description", health, tp, inventory_size);
 	}
 	creatures[i] = NULL;
+	// sounds
+	while (*(line = fgets(linebuff, MAX_LINE, file)) != '\t')
+		;
 	
 	*edest = ents;
 	*gdest = grounds;
@@ -228,28 +235,47 @@ load_game_types(FILE *file, struct entity ***edest, struct ground ***gdest, stru
 }
 
 static struct map *
-load_game_map(FILE *file)
+load_game_map(FILE *file, struct entity **ents, struct ground **grounds, struct creature **creatures)
 {
 	int width, height;
 	fread(&width, sizeof (uint32_t), 1, file);
 	fread(&height, sizeof (uint32_t), 1, file);
 	struct map *map = new_map(width, height);
-	
+	printf("loading game map of size %d, %d\n", width, height);
+	uint32_t index;
+	struct cell *cell;
+	for (int y = 0; y < map->height; y++) {
+		for (int x = 0; x < map->width; x++) {
+			cell = map_get_cell(map, x, y);
+			fread(&index, sizeof (uint32_t), 1, file);
+			printf("fread index: %ud\n", index);
+			if (index != DAT_EMPTY_INDEX) {
+				cell->entities = ents[index];
+			}
+			fread(&index, sizeof (uint32_t), 1, file);
+			printf("fread index: %ud\n", index);
+			if (index != DAT_EMPTY_INDEX) {
+				cell->ground = grounds[index];
+			}
+			fread(&index, sizeof (uint32_t), 1, file);
+			printf("fread index: %ud\n", index);
+			if (index != DAT_EMPTY_INDEX) {
+				cell->creature = creatures[index];
+			}
+		}
+	}
 	return map;
-}
-
-static void
-seek_to_map_start(FILE *file)
-{
-	// TODO: - separation scheme that is actually usable . . . .
 }
 
 struct map * 
 load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, struct creature ***cdest)
 {
+	char buf[MAX_LINE];
 	FILE *file = fopen(inpath, "r");
 	load_game_types(file, edest, gdest, cdest);
-	struct map *map = load_game_map(file);
+	// Separator
+	fgets(buf, MAX_LINE, file);
+	struct map *map = load_game_map(file, *edest, *gdest, *cdest);
 	fclose(file);
 	return map;
 }
@@ -298,6 +324,13 @@ load_old_map_data(char *inpath, struct ground **grounds, struct entity **entitie
 		}
 	}
 	return map;
+}
+
+void 
+load_old_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, struct creature ***cdest)
+{
+	FILE *file = fopen(inpath, "r");
+	load_game_types(file, edest, gdest, cdest);
 }
 
 struct map *

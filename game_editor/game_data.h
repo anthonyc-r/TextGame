@@ -21,9 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MAX_NAME 20
 #define MAX_DESC 100
 #define MAX_LINE 200
-#define DAT_TYPES_SEPARATOR "\t\n"
-#define DAT_MAP_SEPARATOR "\n\a\t\f\n"
-#define DAT_END "\n\f\t\a\n"
+#define DAT_MAP_SEPARATOR "\a\t\f"
+#define DAT_END "\f\t\a"
 #define DAT_EMPTY_INDEX 0xFFFFFFFF
 
 enum size_type {
@@ -83,6 +82,7 @@ void save_game_data(char *outpath, struct entity **entities, struct ground **gro
 struct map *load_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, struct creature ***cdest);
 // Allocates memory, map needs destroying after...
 struct map *load_old_map_data(char *inpath, struct ground **grounds, struct entity **entities, struct creature **creatures);
+void load_old_game_data(char *inpath, struct entity ***edest, struct ground ***gdest, struct creature ***cdest);
 
 // UTIL
 enum size_type entity_size(const char *string);
