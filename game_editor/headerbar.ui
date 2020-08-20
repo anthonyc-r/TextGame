@@ -21,6 +21,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		<property name="visible">True</property>
 		<property name="show-close-button">True</property>
 		<property name="can-focus">False</property>
+			<child>
+			<object class="GtkButton" id="run_button">
+				<property name="visible">True</property>
+				<signal name="clicked" handler="clicked_run" />
+				<child>
+					<object class="GtkImage">
+						<property name="visible">True</property>
+						<property name="icon_name">media-playback-start</property>
+					</object>
+				</child>
+			</object>
+			<packing>
+				<property name="pack_type">start</property>
+			</packing>
+		</child>
 		<child>
 			<object class="GtkMenuButton" id="menu_button">
 				<property name="visible">True</property>

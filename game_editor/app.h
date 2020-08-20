@@ -46,5 +46,6 @@ int editor_app_update_ground(EditorApp *app, struct ground *ground, const char *
 int editor_app_update_entity(EditorApp *app, struct entity *entity, const char *name, const char *desc, const char icon, int weight, enum size_type size_type);
 int editor_app_update_creature(EditorApp *app, struct creature *creature, const char *name, const char *desc, int health, int tp, int inventory_size);
 int editor_app_update_cell(EditorApp *app, struct cell *cell, struct entity *entity, struct creature *creature, struct ground *ground);
+void editor_app_run_game(EditorApp *app);
 #endif
 

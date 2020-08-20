@@ -29,6 +29,13 @@ struct _EditorHeaderbar
 G_DEFINE_TYPE(EditorHeaderbar, editor_headerbar, GTK_TYPE_HEADER_BAR);
 
 static void
+clicked_run(GtkButton *button, gpointer user_data)
+{
+	g_debug("clicked run");
+	editor_app_run_game(current_app);
+}
+
+static void
 editor_headerbar_init(EditorHeaderbar *headerbar)
 {
 	gtk_widget_init_template(GTK_WIDGET(headerbar));
@@ -43,6 +50,7 @@ editor_headerbar_class_init(EditorHeaderbarClass *class)
 {
 	gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),  "/rocks/colourful/textgame/headerbar.ui");
 	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorHeaderbar, menu_button);
+	gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), clicked_run);
 	
 }
 

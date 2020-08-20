@@ -118,7 +118,7 @@ count_model(GtkTreeModel *model)
 }
 
 static void
-save_game_activated(GSimpleAction *action, GVariant *param, gpointer p)
+save_game_to_file(char *filename)
 {
 	int nground, ncreature, nentity, count;
 	nground = count_model(GTK_TREE_MODEL(current_app->ground_types));
@@ -156,7 +156,17 @@ save_game_activated(GSimpleAction *action, GVariant *param, gpointer p)
 			entities[count++] = (struct entity*)value;
 		} while (gtk_tree_model_iter_next(model, &iter));
 	}
-	entities[count] = NULL;
+	entities[count] = NULL;;
+	save_game_data(filename, entities, grounds, creatures, current_app->map);
+	free(grounds);
+	free(entities);
+	free(creatures);
+	g_debug("saved");
+}
+
+static void
+save_game_activated(GSimpleAction *action, GVariant *param, gpointer p)
+{
 	GtkWidget *dialog = gtk_file_chooser_dialog_new(
 		"Save Game Data",
 		GTK_WINDOW(current_app->main_window), 
@@ -170,11 +180,8 @@ save_game_activated(GSimpleAction *action, GVariant *param, gpointer p)
 	}
 	char *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 	gtk_widget_destroy(dialog);
-	save_game_data(filename, entities, grounds, creatures, current_app->map);
+	save_game_to_file(filename);
 	free(filename);
-	free(grounds);
-	free(entities);
-	free(creatures);
 	g_debug("saved");
 }
 
@@ -462,4 +469,11 @@ editor_app_update_cell(EditorApp *app, struct cell *cell, struct entity *entity,
 	editor_main_window_update_cell(app->main_window, app->map, cell->x, 
 		cell->y);
 	return 1;
+}
+
+void
+editor_app_run_game(EditorApp *app)
+{
+	save_game_to_file("tmpgame.dat");
+	system("./game tmpgame.dat");
 }
