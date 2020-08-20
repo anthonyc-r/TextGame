@@ -27,10 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utility.h"
 #include "sound.h"
 
+// Make sure the file is seeked to the start of the types section.
 void
-load_game(char *filename)
+load_game(FILE *fp)
 {
-	FILE *fp = fopen(filename, "r");
 	char *line;
 	int i = 0;
 	all_entities = malloc(100 * sizeof (struct ent));

@@ -29,100 +29,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "debug.h"
 
 struct map *
-load_map(char *filename)
+load_map(FILE *file)
 {
 	printf("loading map\n");
-	FILE *fp = fopen(filename, "rb");
-	printf("opened map file rb\n");
-	int width;
-	int height;
-	if (read_metadata(fp, &width, &height)) {
-		printf("Invalid map file\n");
-		return NULL;
-	} else {
-		printf("Sucessfully loaded metadata\n");
-	}
+	// Separator
+	char buf[MAX_LINE];
+	fgets(buf, MAX_LINE, file);
 	
-	printf("Processed values: Map width: %d, height: %d.\n", width, height);
-	fflush(stdout);
+	int width, height;
+	fread(&width, sizeof (uint32_t), 1, file);
+	fread(&height, sizeof (uint32_t), 1, file);
 	struct map *map = init_map(width, height);
-	printf("init_map done.\n");
-	fflush(stdout);
+	// TODO: - Don't hardcode this 20?!
 	map->creatures = malloc(20 * sizeof(struct ctr));
 	map->creature_count = 0;
-	getc(fp);
-	for (int i = 0; i < height; ++i) {
-		for (int j = 0; j < width; ++j) {
-            DEBUG_PRINT(("Setting up cell, %d, %d\n", i, j));
-			struct cell *current_cell = map->cells + ((i * width) + j);
-			char ground = getc(fp);
-			char entity = getc(fp) - 1;
-			char creature = getc(fp) - 1;
-			current_cell->ground = ground;
-			if (creature >= 0) {
-				struct scrpt *script = script_init("data_devel//gatekeeper_1.script");
-				struct vector2i position = { j, i };
-				insert_creature(map, &all_creatures[(int) creature], script, position);
+	printf("loading game map of size %d, %d\n", width, height);
+	uint32_t index;
+	struct cell *current_cell;
+	for (int y = 0; y < map->height; y++) {
+		for (int x = 0; x < map->width; x++) {
+		 	current_cell = map->cells + ((x * width) + y);
+			fread(&index, sizeof (uint32_t), 1, file);
+			printf("fread index: %ud\n", index);
+			if (index != DAT_EMPTY_INDEX) {
+				struct vector2i position = { x, y };
+				struct scrpt *script = script_init("data_devel//sword.script");
+				insert_entity(map, all_entities[index], script, position);
 			}
-			if (entity >= 0) {
-                struct vector2i position = { j, i };
-                struct scrpt *script = script_init("data_devel//sword.script");
-				insert_entity(map, all_entities[(int) entity], script, position);
+			fread(&index, sizeof (uint32_t), 1, file);
+			printf("fread index: %ud\n", index);
+			if (index != DAT_EMPTY_INDEX) {
+				current_cell->ground = index;
+			}
+			fread(&index, sizeof (uint32_t), 1, file);
+			printf("fread index: %ud\n", index);
+			if (index != DAT_EMPTY_INDEX) {
+				struct scrpt *script = script_init("data_devel//gatekeeper_1.script");
+				struct vector2i position = { x, y };
+				insert_creature(map, &all_creatures[index], script, position);
 			}
 		}
 	}
 	map->creatures = realloc(map->creatures, (map->creature_count + 1) * sizeof(struct ctr));
 	return map;
-}
-
-int
-ascii_dec(char *ascii)
-{
-	printf("ascii_desc for string %s\n", ascii);
-	fflush(stdout);
-	int ret = 0;
-	int len = strlen(ascii);
-	
-	for (int i = 0; i < len; ++i) {
-		ret += pow(10, len - i - 1) * (ascii[i] - 48);
-	}
-	printf("ret ascii_desc %d\n", ret);
-	return ret;
-}
-int
-read_metadata(FILE *fp, int *width, int *height)
-{
-	char *magic = malloc(4);
-	fgets(magic, 4, fp);
-	if (!strcmp(magic, "P6")) {
-		return -1;
-	}
-	free(magic);
-	
-	char line[21];
-	char width_c[10];
-	char height_c[10];
-	fgets(line, 21, fp);
-	printf("size and height line: %s\n", line);
-	size_t i;
-	size_t j;
-	char c;
-	for (i = 0; (c = line[i]) != ' '; ++i) {
-		width_c[i] = c;
-	}
-	width_c[i] = '\0';
-	j = ++i;
-	for (i = 0; (c = line[i + j]) != '\n'; ++i) {
-		height_c[i] = c;
-	}
-	height_c[i] = '\0';
-	char skip[4];
-	fgets(skip, 4, fp);
-	
-	printf("width: %s, height: %s\n", width_c, height_c);
-	fflush(stdout);
-	*width = ascii_dec(width_c);
-	*height = ascii_dec(height_c);
-	return 0;
 }
 

@@ -50,33 +50,39 @@ struct opt_windows {
 void draw(struct map* map);
 
 void
-init_data(void)
+init_data(char *data_path)
 {
 	printf("init game data\n");
 	windows.num = 0;
 	//init game data
-	load_game("data//game.dat");
-    active_map = load_map("data//map2.dat");
-    DEBUG_PRINT(("Load game, load map, done.\n"));
-    struct vector2i plr_position;
-    plr_position.x = 10;
-    plr_position.y = 10;
+	FILE *data_file = fopen(data_path, "r");
+	if (data_file == NULL) {
+		printf("Failed to open data file. Does it exist?\n");
+		return;
+	}
+	load_game(data_file);
+	active_map = load_map(data_file);
+	fclose(data_file);
+	DEBUG_PRINT(("Load game, load map, done.\n"));
+	struct vector2i plr_position;
+	plr_position.x = 10;
+	plr_position.y = 10;
 	struct ctr plr = new_creature("Zoltan", "Powerful mage", 100, 100, 2);
 	plr.hearing = 5;
 	player = insert_creature(active_map, &plr, NULL, plr_position);
 	DEBUG_PRINT(("done inserting test objects\n"));
 	//init display data
-    main_window = new_window(0, 0, 60, 20);
+	main_window = new_window(0, 0, 60, 20);
 	clear_window(main_window, '*');
 	
-    map_window = new_window(0, 0, 40, 15);
+	map_window = new_window(0, 0, 40, 15);
 	clear_window(map_window, ' ');
 	
-    info_window = new_window(25, 0, 25, 2);
+	info_window = new_window(25, 0, 25, 2);
 	clear_window(info_window, ' ');
     
-    chat_window = new_window(0, 15, 60, 5);
-    clear_window(chat_window, '+');
+	chat_window = new_window(0, 15, 60, 5);
+	clear_window(chat_window, '+');
 	
 	inv_window = new_window(40, 2, 20, 14);
 	clear_window(inv_window, ' ');
@@ -490,32 +496,18 @@ logic(struct map *map)
 int
 main(int argc, char *argv[])
 {
-	//printf("loading script\n");
-	//struct scrpt *script = script_init("data_devel//test.script");
-    ////script_describe(script);
-	//exit(1);
-	systemspecific_clear();
-    init_data();
-    printf("Game start - name: %s\n", player->name);
-	systemspecific_clear();
-	
-	/*
-	while (true) {
-		script_perform(script, &player);
-		char *s = player->speech->string;
-		if (s != NULL)
-			printf("Speech string: %s\n", s);
-		printf("======END TURN======\n");
-		char c = getkey();
-		if (c == 'q')
-			break;
+	if (argc < 2) {
+		printf("Usage: %s game.dat\n", argv[0]);
+		return 1;
 	}
-	exit(0);
-	*/
+	systemspecific_clear();
+	init_data(argv[1]);
+	printf("Game start - name: %s\n", player->name);
+	systemspecific_clear();
  	while (1) {
 		draw(active_map);
 		logic(active_map);
 	}
-    printf("Game end\n");
-    return 0;
+	printf("Game end\n");
+	return 0;
 }

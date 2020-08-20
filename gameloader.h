@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define _GAMELOADER_H
 #include <stdio.h>
 
-void load_game(char *filename);
+void load_game(FILE *file);
 int read_item(char *line, char *name, char *icon, int *weight);
 int read_cell(char *line, char *name, char *icon);
 int read_creature(char *line, char *name, int *health, int *tp, int *inventory, char *desc);

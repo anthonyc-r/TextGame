@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MAX_LINE 200
 #define DAT_MAP_SEPARATOR "\a\t\f"
 #define DAT_END "\f\t\a"
+// Keep in sync with the main game.
 #define DAT_EMPTY_INDEX 0xFFFFFFFF
 
 enum size_type {

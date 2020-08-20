@@ -18,9 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _MAPLOADER_H
 #define _MAPLOADER_H
 
+#include <stdio.h>
+
+#define MAX_LINE 255
+#define DAT_EMPTY_INDEX 0xFFFFFFFF
+
 struct map;
 
-struct map *load_map(char *filename);
+struct map *load_map(FILE *file);
 int ascii_dec(char *ascii);
 int read_metadata(FILE *fp, int *width, int *height);
 #endif
