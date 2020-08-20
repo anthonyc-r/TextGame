@@ -59,6 +59,15 @@ iter_to_match(GtkListStore *list, void *needle, GtkTreeIter *res)
 }
 
 static void
+clear_list(GtkListStore *list)
+{
+	GtkTreeIter iter;
+	while (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(list), &iter)) {
+		gtk_list_store_remove(list, &iter);
+	}
+}
+
+static void
 editor_app_activate(GApplication *app)
 {
 	EditorMainWindow *window;
@@ -196,6 +205,9 @@ load_game_activated(GSimpleAction *action, GVariant *param, gpointer p)
 	g_debug("game data loaded");
 	free(filename);
 	// TODO: - Reset lists
+	clear_list(current_app->ground_types);
+	clear_list(current_app->entity_types);
+	clear_list(current_app->creature_types);
 	while (*grounds != NULL) {
 		editor_app_add_ground(current_app, *grounds);
 		grounds++;
