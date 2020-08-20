@@ -1,3 +1,4 @@
+bin/
 obj/
 game_editor/main
 game_editor/resources.c
