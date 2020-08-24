@@ -475,5 +475,6 @@ void
 editor_app_run_game(EditorApp *app)
 {
 	save_game_to_file("tmpgame.dat");
-	system("./game tmpgame.dat");
+	// Will be replaced by gui eventually.
+	system("gnome-terminal -- ./game ./tmpgame.dat");
 }

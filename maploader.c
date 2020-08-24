@@ -48,7 +48,7 @@ load_map(FILE *file)
 	struct cell *current_cell;
 	for (int y = 0; y < map->height; y++) {
 		for (int x = 0; x < map->width; x++) {
-		 	current_cell = map->cells + ((x * width) + y);
+		 	current_cell = map->cells + ((y * width) + x);
 			fread(&index, sizeof (uint32_t), 1, file);
 			printf("fread index: %ud\n", index);
 			if (index != DAT_EMPTY_INDEX) {
@@ -60,6 +60,8 @@ load_map(FILE *file)
 			printf("fread index: %ud\n", index);
 			if (index != DAT_EMPTY_INDEX) {
 				current_cell->ground = index;
+			} else {
+				current_cell->ground = -1;
 			}
 			fread(&index, sizeof (uint32_t), 1, file);
 			printf("fread index: %ud\n", index);
