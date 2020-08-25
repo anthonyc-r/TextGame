@@ -97,9 +97,58 @@ create_ground_activated(GSimpleAction *action, GVariant *param, gpointer p)
 {
 	g_debug("tapped create ground");
 	struct ground *ground = new_ground("", '-');
-	EditorCreateResourceWindow *window = editor_create_resource_window_new(current_app, ground_created, (void*)ground,
-		RESOURCE_FIELD_NAME, "name", &ground->name,
+	EditorCreateResourceWindow *window = editor_create_resource_window_new(current_app, ground_created, 
+		(void*)ground,
+		RESOURCE_FIELD_NAME, "name", ground->name,
 		RESOURCE_FIELD_CHAR, "icon", &ground->icon, 
+		0);
+	gtk_window_present(GTK_WINDOW(window));
+}
+
+static void 
+entity_created(void *userdata)
+{
+	struct entity *entity = userdata;
+	g_debug("entity created, name: %s, char: %c", entity->name, entity->icon);
+	editor_app_add_entity(current_app, entity);
+}
+
+static void
+create_entity_activated(GSimpleAction *action, GVariant *param, gpointer p)
+{
+	g_debug("tapped create entity");
+	struct entity *entity = new_entity("", "", '0', 0, SIZE_NONE);
+	EditorCreateResourceWindow *window = editor_create_resource_window_new(current_app, entity_created, 
+		(void*)entity,
+		RESOURCE_FIELD_NAME, "name", entity->name,
+		RESOURCE_FIELD_DESC, "description", entity->desc,
+		RESOURCE_FIELD_CHAR, "icon", &entity->icon, 
+		RESOURCE_FIELD_INT, "weight", &entity->weight,
+		RESOURCE_FIELD_SIZE_TYPE, "size type", &entity->size_class,
+		0);
+	gtk_window_present(GTK_WINDOW(window));
+}
+
+static void 
+creature_created(void *userdata)
+{
+	struct creature *creature = userdata;
+	g_debug("creature created, name: %s", creature->name);
+	editor_app_add_creature(current_app, creature);
+}
+
+static void
+create_creature_activated(GSimpleAction *action, GVariant *param, gpointer p)
+{
+	g_debug("tapped create creature");
+	struct creature *creature = new_creature("", "", 0, 0, 0);
+	EditorCreateResourceWindow *window = editor_create_resource_window_new(current_app, creature_created, 
+		(void*)creature,
+		RESOURCE_FIELD_NAME, "name", creature->name,
+		RESOURCE_FIELD_DESC, "description", creature->desc, 
+		RESOURCE_FIELD_INT, "health", &creature->health, 
+		RESOURCE_FIELD_INT, "tp", &creature->tp,
+		RESOURCE_FIELD_INT, "inventory size", &creature->inventory_size,
 		0);
 	gtk_window_present(GTK_WINDOW(window));
 }
@@ -300,6 +349,8 @@ static GActionEntry editor_app_entries[] =
 	{"load_game", load_game_activated, NULL, NULL, NULL},
 	{"save_game", save_game_activated, NULL, NULL, NULL},
 	{"create_ground", create_ground_activated, NULL, NULL, NULL},
+	{"create_creature", create_creature_activated, NULL, NULL, NULL},
+	{"create_entity", create_entity_activated, NULL, NULL, NULL},
 	{"load_old_map", load_old_map_activated, NULL, NULL, NULL },
 	{"load_old_dat", load_old_dat_activated, NULL, NULL, NULL }
 };

@@ -23,8 +23,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 enum resource_field_type {
 	_RESOURCE_FIELD_END,
 	RESOURCE_FIELD_NAME,
+	RESOURCE_FIELD_DESC,
 	RESOURCE_FIELD_CHAR,
-	RESOURCE_FIELD_INT
+	RESOURCE_FIELD_INT,
+	RESOURCE_FIELD_SIZE_TYPE
 };
 
 #define EDITOR_CREATE_RESOURCE_WINDOW_TYPE (editor_create_resource_window_get_type ())

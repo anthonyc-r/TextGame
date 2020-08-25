@@ -53,7 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 			</item>
 			<item>
 				<attribute name="label" translatable="yes">Item Type</attribute>
-				<attribute name="action">app.create_item</attribute>
+				<attribute name="action">app.create_entity</attribute>
 			</item>
 			</section>
 		</submenu>

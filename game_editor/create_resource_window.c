@@ -54,7 +54,7 @@ add_field_row(EditorCreateResourceWindow *window, int i)
 static void 
 set_name(char *dest, char const *src) 
 {
-	strncpy(dest, src, MAX_NAME);
+	copy_name(dest, src);
 }
 static void
 set_char(char *dest, char const *src)
@@ -64,7 +64,25 @@ set_char(char *dest, char const *src)
 static void
 set_int(int *dest, char const *src)
 {
-	*dest = -1;
+	char *ep;
+	long val = strtol(src, &ep, 10);
+	if (*src != '\0' && *ep == '\0') {
+		*dest = val;
+	} else {
+		*dest = -1;
+	}
+}
+static void
+set_desc(char *dest, char const *src)
+{
+	g_debug("copying value %s into dest", src);
+	copy_desc(dest, src);
+}
+
+static void
+set_size_type(enum size_type *dest, const char *src)
+{
+	*dest = entity_size(src);
 }
 
 static void
@@ -88,12 +106,19 @@ clicked_done(GtkButton *button, EditorCreateResourceWindow *window)
 			case RESOURCE_FIELD_INT:
 				set_int((int*)dest, src);
 				break;
+			case RESOURCE_FIELD_DESC:
+				set_desc((char*)dest, src);
+				break;
+			case RESOURCE_FIELD_SIZE_TYPE:
+				set_size_type((enum size_type*)dest, src);
+				break;
 			default:
 				g_debug("unhandled resource field type!");
 		}
 		
 	}
 	window->callback(window->userdata);
+	gtk_widget_destroy(GTK_WIDGET(window));
 }
 
 static void
