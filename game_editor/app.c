@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "main_window.h"
 #include "game_data.h"
 #include "create_resource_window.h"
+#include "settings_window.h"
 
 struct _EditorApp
 {
@@ -82,6 +83,13 @@ static void
 quit_activated(GSimpleAction *action, GVariant *param, gpointer app)
 {
 	g_application_quit(G_APPLICATION(app));
+}
+
+static void
+settings_activated(GSimpleAction *action, GVariant *param, gpointer app)
+{
+	EditorSettingsWindow *window = editor_settings_window_new();
+	gtk_window_present(GTK_WINDOW(window));
 }
 
 static void 
@@ -346,6 +354,7 @@ load_old_dat_activated(GSimpleAction *action, GVariant *param, gpointer p)
 static GActionEntry editor_app_entries[] = 
 {
 	{"quit", quit_activated, NULL, NULL, NULL },
+	{"settings", settings_activated, NULL, NULL, NULL },
 	{"load_game", load_game_activated, NULL, NULL, NULL},
 	{"save_game", save_game_activated, NULL, NULL, NULL},
 	{"create_ground", create_ground_activated, NULL, NULL, NULL},

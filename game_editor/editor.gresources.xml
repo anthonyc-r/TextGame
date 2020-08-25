@@ -15,4 +15,7 @@
 	<gresource prefix="/rocks/colourful/textgame">
 		<file preprocess="xml-stripblanks">properties_view.ui</file>
 	</gresource>
+	<gresource prefix="/rocks/colourful/textgame">
+		<file preprocess="xml-stripblanks">settings_window.ui</file>
+	</gresource>
 </gresources>
