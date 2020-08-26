@@ -16,24 +16,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "settings_window.h"
+#include "settings.h"
 
 struct _EditorSettingsWindow
 {
 	GtkApplicationWindow parent;
+	GtkEntry *terminal_entry;
 };
 
 G_DEFINE_TYPE(EditorSettingsWindow, editor_settings_window, GTK_TYPE_APPLICATION_WINDOW);
 
 static void
+clicked_apply(GtkButton *button, gpointer user_data)
+{
+	EditorSettingsWindow *window = user_data;
+	settings_set_terminal_emulator(gtk_entry_get_text(window->terminal_entry));
+	g_debug("applied settings");
+}
+
+static void
 editor_settings_window_init(EditorSettingsWindow *window)
 {
 	gtk_widget_init_template(GTK_WIDGET(window));
+	gtk_entry_set_text(window->terminal_entry, settings_get_terminal_emulator());
 }
 
 static void
 editor_settings_window_class_init(EditorSettingsWindowClass *class)
 {
 	gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),  "/rocks/colourful/textgame/settings_window.ui");
+	gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), EditorSettingsWindow,
+		terminal_entry);
+	gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), clicked_apply);
 }
 
 EditorSettingsWindow *

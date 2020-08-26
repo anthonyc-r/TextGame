@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "game_data.h"
 #include "create_resource_window.h"
 #include "settings_window.h"
+#include "settings.h"
 
 struct _EditorApp
 {
@@ -534,7 +535,11 @@ editor_app_update_cell(EditorApp *app, struct cell *cell, struct entity *entity,
 void
 editor_app_run_game(EditorApp *app)
 {
-	save_game_to_file("tmpgame.dat");
+	//save_game_to_file("tmpgame.dat");
+	const char *prog = settings_get_terminal_emulator();
+	char *argv[2] = {"./game", "./tmpgame.dat"};
+	g_spawn_async(NULL, argv, NULL, 
+		G_SPAWN_DEFAULT, NULL, NULL, NULL, NULL);
 	// Will be replaced by gui eventually.
-	system("gnome-terminal -- ./game ./tmpgame.dat");
+	//system("gnome-terminal -- ./game ./tmpgame.dat");
 }
