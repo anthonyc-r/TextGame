@@ -17,6 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _SETTINGS_H
 #define _SETTINGS_H
 
+#define MAX_SETTING_LEN 100
+#define SETTINGS_FILE_NAME game_editor.conf
+
 const char *settings_get_terminal_emulator();
 void settings_set_terminal_emulator(const char *new_value);
 
