@@ -87,28 +87,57 @@ scan_for_setting(const char *key, GFileIOStream *stream, goffset *line_start, ch
 }
 
 static void
-insert_line(GFileIOStream *iostream, const char *line)
+append_line(GFileIOStream *iostream, const char *line)
+{	
+	g_debug("Will append line");
+	GOutputStream *ostream;
+	g_object_get(iostream, "output-stream", &ostream, NULL);
+	g_seekable_seek(G_SEEKABLE(ostream), 0, G_SEEK_END, NULL, NULL);
+	g_output_stream_write_all(ostream, line, strlen(line), NULL, NULL, NULL);
+	g_output_stream_write(ostream, "\n", 1, NULL, NULL);
+	g_object_unref(ostream);
+}
+
+static void
+overwrite_line(GFileIOStream *iostream, const char *existing_line, int existing_len, const char *new_line, int new_len, goffset loc)
 {
+	g_debug("Will overwrite line current len %d, new len %d", existing_len, new_len);
+	GOutputStream *ostream;
+	GInputStream *istream;
+
+	g_object_get(iostream, "output-stream", &ostream, NULL);
+	g_object_get(iostream, "input-stream", &istream, NULL);
+	if (new_len > existing_len) {
+		
+	} else if (new_len < existing_len) {
 	
+	}
+	g_seekable_seek(G_SEEKABLE(iostream), loc, G_SEEK_SET, NULL, NULL);
+	g_output_stream_write_all(ostream, new_line, new_len, NULL, NULL, NULL);
 }
 
 static void 
 settings_set(const char *name, const char *value)
 {
+	g_debug("setting value for %s", name);
 	GFileIOStream *iostream = open_settings_stream();
-	char *line;
+	char *existing_line, *new_line;
 	goffset line_start;
-	int line_len; 
+	int existing_len, new_len;
 	
-	if (scan_for_setting(name, iostream, &line_start, &line)) {
-		free(line);
+	new_len = strlen(name) + strlen(value) + 2;
+	new_line = malloc(new_len);
+	snprintf(new_line, new_len, "%s\t%s", name, value);
+	new_line[new_len - 1] = '\0';
+	
+	if (scan_for_setting(name, iostream, &line_start, &existing_line)) {
+		existing_len = strlen(existing_line);
+		overwrite_line(iostream, existing_line, existing_len, new_line, 
+			new_len - 1, line_start);
+		free(existing_line);
+	} else {
+		append_line(iostream, new_line);
 	}
-	g_seekable_seek(G_SEEKABLE(iostream), line_start, G_SEEK_SET, NULL, NULL);
-	line_len = strlen(name) + strlen(value) + 2;
-	line = malloc(line_len);
-	snprintf(line, line_len, "%s\t%s", name, value);
-	line[line_len - 1] = '\0';
-	insert_line(iostream, line);
 	g_io_stream_close(G_IO_STREAM(iostream), NULL, NULL);
 }
 
