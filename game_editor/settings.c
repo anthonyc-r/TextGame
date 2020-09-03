@@ -64,6 +64,8 @@ readline(GInputStream *istream, goffset *line_start)
 	line = malloc(line_len + 1);
 	g_seekable_seek(G_SEEKABLE(istream), *line_start, G_SEEK_SET, NULL, NULL);
 	g_input_stream_read_all(istream, line, line_len, NULL, NULL, NULL);
+	// Read past the newline
+	g_seekable_seek(G_SEEKABLE(istream), 1, G_SEEK_CUR, NULL, NULL);
 	line[line_len] = '\0';
 	return line;
 }
@@ -76,6 +78,7 @@ scan_for_setting(const char *key, GFileIOStream *stream, goffset *line_start, ch
 	g_object_get(stream, "input-stream", &istream, NULL);
 	int res = 0;
 	while ((*line = readline(istream, line_start)) != NULL) {
+		g_debug("comparing '%s' with '%s'", *line, key);
 		if (strncmp(*line, key, strlen(key)) == 0) {
 			res = 1;
 			break;
