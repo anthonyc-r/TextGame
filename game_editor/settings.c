@@ -104,16 +104,33 @@ overwrite_line(GFileIOStream *iostream, const char *existing_line, int existing_
 	g_debug("Will overwrite line current len %d, new len %d", existing_len, new_len);
 	GOutputStream *ostream;
 	GInputStream *istream;
+	gsize fend, shiftlen, nread;
+	char *lbuff;
 
+	g_seekable_seek(G_SEEKABLE(iostream), 0, G_SEEK_END, NULL, NULL);
+	fend = g_seekable_tell(G_SEEKABLE(iostream));
+	shiftlen = fend - (loc + existing_len);
+	
 	g_object_get(iostream, "output-stream", &ostream, NULL);
 	g_object_get(iostream, "input-stream", &istream, NULL);
-	if (new_len > existing_len) {
-		
-	} else if (new_len < existing_len) {
-	
+	// Need to shift the file around to make room
+	if (new_len != existing_len) {
+		g_debug("Shifting last %ld of file", shiftlen);
+		lbuff = malloc(shiftlen);
+		g_seekable_seek(G_SEEKABLE(ostream), loc + existing_len, G_SEEK_SET, NULL, NULL);
+		g_input_stream_read_all(istream, lbuff, shiftlen, &nread, NULL, NULL);
+		g_seekable_seek(G_SEEKABLE(ostream), loc + new_len, G_SEEK_SET, NULL, NULL);
+		g_output_stream_write_all(ostream, lbuff, nread, NULL, NULL, NULL);
+		free(lbuff);
+		if (new_len < existing_len) {
+			fend = g_seekable_tell(G_SEEKABLE(ostream));
+			g_seekable_truncate(G_SEEKABLE(ostream), fend, NULL, NULL);
+		}
 	}
 	g_seekable_seek(G_SEEKABLE(iostream), loc, G_SEEK_SET, NULL, NULL);
 	g_output_stream_write_all(ostream, new_line, new_len, NULL, NULL, NULL);
+	g_object_unref(ostream);
+	g_object_unref(istream);
 }
 
 static void 
