@@ -54,11 +54,11 @@ read_line(FILE *fp)
 {
 	char *line;
 	int i = 0;
-	char c;
+	int c;
 	fpos_t pos;
 	fgetpos(fp, &pos);
 
-	while ((c = fgetc(fp)) != '\n' && c != EOF)
+	while ((char)(c = fgetc(fp)) != '\n' && c != EOF)
 		++i;
 	if (c == EOF && i == 0)
 		return NULL;

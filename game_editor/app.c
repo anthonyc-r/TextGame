@@ -535,11 +535,17 @@ editor_app_update_cell(EditorApp *app, struct cell *cell, struct entity *entity,
 void
 editor_app_run_game(EditorApp *app)
 {
-	//save_game_to_file("tmpgame.dat");
+	save_game_to_file("tmpgame.dat");
 	const char *prog = settings_get_terminal_emulator();
-	char *argv[2] = {"./game", "./tmpgame.dat"};
-	g_spawn_async(NULL, argv, NULL, 
-		G_SPAWN_DEFAULT, NULL, NULL, NULL, NULL);
-	// Will be replaced by gui eventually.
-	//system("gnome-terminal -- ./game ./tmpgame.dat");
+	g_debug("Launching %s to handle game", prog);
+	char *argv[] = { (char *)prog, "--command=\"./game ./tmpgame.dat\"", NULL };
+	int flags = G_SPAWN_DO_NOT_REAP_CHILD | G_SPAWN_SEARCH_PATH;
+	int cstdout, cstderr;
+	GPid cpid;
+	g_autoptr(GError) error = NULL;
+	g_spawn_async_with_pipes(NULL, argv, NULL, flags, NULL,
+		NULL, &cpid, NULL, &cstdout, &cstderr, &error);
+	if (error != NULL) {
+		g_error("Error when spawing process!");
+	}
 }
