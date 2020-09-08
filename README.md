@@ -16,6 +16,7 @@ A simple text based game...
 ## Game Editor
 - There is a simple game editor written in GTK3 found in game_editor, compiling it requires GTK3 development packages installed
 
+
 ## Building
 - Currently the game is only tested and running on Ubuntu linux, other distributions should have no trouble compiling it with development tools and GTK3 installed.
 - There's some very basic build scripts. `build.sh` just compiles the editor and the main game then copies them together so that the game editor may start the game up with a convenient 'run' button. There's no build system used right now.
@@ -26,6 +27,7 @@ A simple text based game...
 - Tap the hamburger button
 - Tap 'Load Game'
 - Navigate to ./data and select game_1.dat
+- Set up which terminal emulator to use (default is xterm) via hamburger>Preferences
 - Tap the 'play' button to the left of the navigation bar
 (Note that this currently assumes you have gnome-terminal installed! See `app.c` - `editor_app_run_game()`)
 
@@ -39,7 +41,6 @@ A simple text based game...
 
 ## TODO
 ### Game Editor
-- Default terminal selection. Game currently assumes you have gnome-terminal installed. At least until 3D graphics are implemented there has to be a way to change this from some kind of game editor config screen.
 - Better item painting. Should be able to `paint` a ground. Right now you need to click a button, then pick the ground type from a dropdown. This won't work with the current button grid implementation, so some kind of custom view needs implementing that supports this click/paint to set content, as well as the current click to see properties. Probably implemented by a mode switch button, to switch between click to paint and click to see cell properties.
 - Multiple map support. See the `Game` section. The editor has to support this too!
 - Script Editing. There should be a 'scripts' resource type listed with ground/creature/entities. These should be assignable to creatures and entities via the properties window. You should be able to double click a script in the resource list window to replace the map grid with a text editor, for editing the activated script. Perhaps the map grid would be replaced with some kind of tabbed view, and activating the script creates a text editor tab.
