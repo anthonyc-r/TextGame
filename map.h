@@ -48,7 +48,7 @@ struct map {
 } *active_map;
 
 struct cell {
-    char ground;
+    int ground;
     
     struct cell *north;
     struct cell *east;
